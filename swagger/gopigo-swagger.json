@@ -1,0 +1,552 @@
+swagger: "2.0"
+info:
+  description: "GoPiGo controller server. Offers an interface to remotely control a GoPiGo robot."
+  version: "0.0.1"
+  title: "GoPiGo server"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "fernandosanchezmunoz@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "gopigo.swagger.io"
+basePath: "/v1"
+tags:
+- name: "gopigo"
+  description: "GoPiGo robot"
+  externalDocs:
+    description: "Find out more at GoPiGo github site."
+    url: "https://github.com/DexterInd/GoPiGo"
+schemes:
+- "http"
+paths:
+  /gopigo:
+    get:
+      tags:
+      - "gopigo"
+      summary: "get GoPiGo system information"
+      description: "get GoPiGo system information like version, revision and such."
+      operationId: "getGoPiGo"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/GoPiGo"
+        404:
+          description: "Error getting system information."
+  /gopigo/status:
+    get:
+      tags:
+      - "gopigo"
+      summary: "get GoPiGo status"
+      description: "get GoPiGo system status register. list with  l[0]-enc_status / l[1]-timeout_status"
+      operationId: "getStatus"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Status"
+        404:
+          description: "Error getting system information."
+  /gopigo/motor:
+    get:
+      tags:
+      - "gopigo"
+      summary: "Finds available motors"
+      description: "Finds motors installed and available in the system. Returns a list with the names and features if available."
+      operationId: "findMotors"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Motor"
+        400:
+          description: "Invalid Motor ID supplied"
+        404:
+          description: "Motor not found"
+  /gopigo/motor/{motorId}:
+    get:
+      tags:
+      - "gopigo"
+      summary: "Find motor by ID"
+      description: "Returns a single motor's information"
+      operationId: "getMotorById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "motorId"
+        in: "path"
+        description: "ID of motor to return. 1 for left, 2 for right."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Motor"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Motor not found"
+  /gopigo/motor/{motorId}/control:
+    post:
+      tags:
+      - "gopigo"
+      summary: "Control a Motor fwd/bwd with direction and speed."
+      description: ""
+      operationId: "controlMotor"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "motorId"
+        in: "path"
+        description: "ID of motor to rotate. 1 for left, 2 for right."
+        required: true
+        type: "integer"
+        format: "int32"
+      - name: "direction"
+        in: "query"
+        description: "Direction to set in the motor. TODO: clarify value."
+        type: "integer"
+        required: true
+        format: "int32"
+      - name: "speed"
+        in: "query"
+        required: true
+        description: "Speed to set in the motor. Ranges from 0->255"
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        404:
+          description: "Control Motor operation failed"
+  /gopigo/motor/{motorId}/speed:
+    post:
+      tags:
+      - "gopigo"
+      summary: "set a Motor speed in range 0->255."
+      description: "set Motor speed"
+      operationId: "setMotorSpeed"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "motorId"
+        in: "path"
+        description: "ID of motor to set speed on. 1 for left, 2 for right."
+        required: true
+        type: "integer"
+        format: "int32"
+      - name: "speed"
+        in: "query"
+        required: true
+        description: "Speed to set in the motor. Ranges from 0->255"
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        404:
+          description: "set Motor Speed operation failed"
+  /gopigo/motor/forward:
+      post:
+        tags:
+        - "gopigo"
+        summary: "Move the GoPiGo forward a certain number of cms."
+        description: ""
+        operationId: "moveForward"
+        parameters:
+        - name: "distance"
+          in: "query"
+          description: "distance in cms to move forward"
+          required: true
+          type: "integer"
+          format: "int32"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              $ref: "#/definitions/ApiResponse"
+          404:
+            description: "move forward operation failed"
+  /gopigo/motor/backward:
+      post:
+        tags:
+        - "gopigo"
+        summary: "Move the GoPiGo backward a certain number of cms."
+        description: "Move the GoPiGo backward a certain number of cms."
+        operationId: "moveBackward"
+        parameters:
+        - name: "distance"
+          in: "query"
+          description: "distance in cms to move backward"
+          required: true
+          type: "integer"
+          format: "int32"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              $ref: "#/definitions/ApiResponse"
+          404:
+            description: "move backward operation failed"
+  /gopigo/motor/motor_backward:
+      post:
+        tags:
+        - "gopigo"
+        summary: "Move GoPiGo back without PID control"
+        description: "Move GoPiGo backward without PID control"
+        operationId: "motorBackward"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              $ref: "#/definitions/ApiResponse"
+          404:
+            description: "motor_backward operation failed"
+  /gopigo/motor/left:
+      post:
+        tags:
+        - "gopigo"
+        summary: "Turn GoPiGo Left slow (one motor off, better control)"
+        description: "Turn GoPiGo Left slow (one motor off, better control)"
+        operationId: "left"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              $ref: "#/definitions/ApiResponse"
+          404:
+            description: "move left operation failed"
+  /gopigo/motor/left_rotation:
+      post:
+        tags:
+        - "gopigo"
+        summary: "Rotate GoPiGo left in same position (both motors moving in the opposite direction)"
+        description: "Rotate GoPiGo left in same position (both motors moving in the opposite direction)"
+        operationId: "leftRotation"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              $ref: "#/definitions/ApiResponse"
+          404:
+            description: "rotate left operation failed"
+  /gopigo/motor/left_turn:
+      post:
+        tags:
+        - "gopigo"
+        summary: "turn x degrees to the left"
+        description: "turn x degrees to the left"
+        operationId: "leftTurn"
+        parameters:
+        - name: "degrees"
+          in: "query"
+          description: "number of degrees to turn left"
+          required: true
+          type: "integer"
+          format: "int32"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              $ref: "#/definitions/ApiResponse"
+          404:
+            description: "turn left x degrees failed"
+  /gopigo/motor/left_turn_wait_for_completion:
+      post:
+        tags:
+        - "gopigo"
+        summary: "turn x degrees to the left, but blocking"
+        description: "turn x degrees to the left, but blocking"
+        operationId: "leftTurnWaitForCompletion"
+        parameters:
+        - name: "degrees"
+          in: "query"
+          description: "number of degrees to turn left"
+          required: true
+          type: "integer"
+          format: "int32"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              $ref: "#/definitions/ApiResponse"
+          404:
+            description: "turn left x degrees waiting for completion failed"
+  /gopigo/motor/right:
+      post:
+        tags:
+        - "gopigo"
+        summary: "Turn GoPiGo Right slow (one motor off, better control)"
+        description: "Turn GoPiGo Right slow (one motor off, better control)"
+        operationId: "right"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              $ref: "#/definitions/ApiResponse"
+          404:
+            description: "move right operation failed"
+  /gopigo/motor/right_rotation:
+      post:
+        tags:
+        - "gopigo"
+        summary: "Rotate GoPiGo right in same position (both motors moving in the opposite direction)"
+        description: "Rotate GoPiGo right in same position (both motors moving in the opposite direction)"
+        operationId: "rightRotation"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              $ref: "#/definitions/ApiResponse"
+          404:
+            description: "rotate right operation failed"
+  /gopigo/motor/right_turn:
+      post:
+        tags:
+        - "gopigo"
+        summary: "turn x degrees to the right"
+        description: "turn x degrees to the right"
+        operationId: "rightTurn"
+        parameters:
+        - name: "degrees"
+          in: "query"
+          description: "number of degrees to turn right"
+          required: true
+          type: "integer"
+          format: "int32"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              $ref: "#/definitions/ApiResponse"
+          404:
+            description: "turn right x degrees failed"
+  /gopigo/motor/right_turn_wait_for_completion:
+      post:
+        tags:
+        - "gopigo"
+        summary: "turn x degrees to the right, but blocking"
+        description: "turn x degrees to the right, but blocking"
+        operationId: "rightTurnWaitForCompletion"
+        parameters:
+        - name: "degrees"
+          in: "query"
+          description: "number of degrees to turn right"
+          required: true
+          type: "integer"
+          format: "int32"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              $ref: "#/definitions/ApiResponse"
+          404:
+            description: "turn right x degrees waiting for completion failed"
+  /gopigo/motor/stop:
+      post:
+        tags:
+        - "gopigo"
+        summary: "Stop the GoPiGo"
+        description: "Stop the GoPiGo"
+        operationId: "stop"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              $ref: "#/definitions/ApiResponse"
+          404:
+            description: "stop operation failed"
+  /gopigo/motor/speed:
+    get:
+      tags:
+      - "gopigo"
+      summary: "Reads the current Speed from the motors"
+      description: "Mapped to read_motor_speed(), returns an array with the speed of both motors"
+      operationId: "getSpeed"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        404:
+          description: "read speed operation failed"
+    post:
+      tags:
+      - "gopigo"
+      summary: "set the GoPiGo speed in range 0->255."
+      description: "set the speed by setting it in both motors simultaneously."
+      operationId: "setSpeed"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "speed"
+        in: "query"
+        required: true
+        description: "Speed to set in both motors. Ranges from 0->255"
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        404:
+          description: "set Speed operation failed"
+  /gopigo/motor/speed/increase:
+      post:
+        tags:
+        - "gopigo"
+        summary: "Increase the speed by 10"
+        description: "Increase the speed by 10"
+        operationId: "speedIncrease"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              $ref: "#/definitions/ApiResponse"
+          404:
+            description: "speed increase operation failed"
+  /gopigo/motor/speed/decrease:
+      post:
+        tags:
+        - "gopigo"
+        summary: "Decrease the speed by 10"
+        description: "Decrease the speed by 10"
+        operationId: "speedDecrease"
+        responses:
+          200:
+            description: "successful operation"
+            schema:
+              $ref: "#/definitions/ApiResponse"
+          404:
+            description: "speed decrease operation failed"
+  /gopigo/encoder:
+    get:
+      summary: "Placeholder"
+      description: "Placeholder"
+      responses:
+        200:
+          schema: { }
+          description: "Operation Successful"
+  /gopigo/ultrasonic:
+    get:
+      summary: "Placeholder"
+      description: "Placeholder"
+      responses:
+        200:
+          schema: { }
+          description: "Operation Successful"
+  /gopigo/led:
+    get:
+      summary: "Placeholder"
+      description: "Placeholder"
+      responses:
+        200:
+          schema: { }
+          description: "Operation Successful"
+  /gopigo/servo:
+    get:
+      summary: "Placeholder"
+      description: "Placeholder"
+      responses:
+        200:
+          schema: { }
+          description: "Operation Successful"
+  /gopigo/ir:
+    get:
+      summary: "Placeholder"
+      description: "Placeholder"
+      responses:
+        200:
+          schema: { }
+          description: "Operation Successful"
+  /gopigo/dht:
+    get:
+      summary: "Placeholder"
+      description: "Placeholder"
+      responses:
+        200:
+          schema: { }
+          description: "Operation Successful"
+  /gopigo/ui:
+    get:
+      summary: "Placeholder"
+      description: "Placeholder"
+      responses:
+        200:
+          schema: { }
+          description: "Operation Successful"
+definitions:
+  GoPiGo:
+    type: "object"
+    properties:
+      version:
+        type: "integer"
+        description: "GoPiGo board version. Currently 14 or 16"
+        format: "int32"
+      revision:
+        type: "integer"
+        description: "GoPiGo board revision."
+        format: "int32"        
+      firmware_version:
+        type: "integer"
+        description: "GoPiGo firmware version."
+        format: "int32" 
+      cpu_speed:
+        type: "integer"
+        description: "GoPiGo firmware version."
+        format: "int32"
+  Status:
+    type: "array"
+    description: "list with /bytes? l[0]-enc_status. l[1]-timeout_status"
+    items:
+      type: "string"
+      format: "binary"
+  Motor:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        description: "ID of the motor. 1=left, 2=right."
+        format: "int32"
+      speed:
+        type: "integer"
+        description: "Current motor speed."
+        format: "int32"     
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
+externalDocs:
+  description: "Find out more about GoPiGo"
+  url: "https://github.com/DexterInd/GoPiGo"
