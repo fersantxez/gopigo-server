@@ -10,7 +10,7 @@ info:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
 host: "gopigo.swagger.io"
-basePath: "/v1"
+basePath: "/v2"
 tags:
 - name: "gopigo"
   description: "GoPiGo robot"
@@ -94,6 +94,8 @@ paths:
         description: "ID of motor to return. 1 for left, 2 for right."
         required: true
         type: "integer"
+        minimum: 1
+        maximum: 2
       responses:
         200:
           description: "successful operation"
@@ -119,6 +121,8 @@ paths:
         required: true
         type: "integer"
         format: "int32"
+        minimum: 1
+        maximum: 2
       - name: "direction"
         in: "query"
         description: "Direction to set in the motor. TODO: clarify value."
@@ -131,6 +135,8 @@ paths:
         description: "Speed to set in the motor. Ranges from 0->255"
         type: "integer"
         format: "int32"
+        minimum: 0
+        maximum: 255
       responses:
         200:
           description: "successful operation"
@@ -154,12 +160,16 @@ paths:
         required: true
         type: "integer"
         format: "int32"
+        minimum: 1
+        maximum: 2
       - name: "speed"
         in: "query"
         required: true
         description: "Speed to set in the motor. Ranges from 0->255"
         type: "integer"
         format: "int32"
+        minimum: 0
+        maximum: 255
       responses:
         200:
           description: "successful operation"
@@ -168,7 +178,7 @@ paths:
         404:
           description: "set Motor Speed operation failed"
   /gopigo/motor/forward:
-      post:
+      get:
         tags:
         - "gopigo"
         summary: "Move the GoPiGo forward a certain number of cms."
@@ -189,7 +199,7 @@ paths:
           404:
             description: "move forward operation failed"
   /gopigo/motor/backward:
-      post:
+      get:
         tags:
         - "gopigo"
         summary: "Move the GoPiGo backward a certain number of cms."
@@ -210,7 +220,7 @@ paths:
           404:
             description: "move backward operation failed"
   /gopigo/motor/motor_backward:
-      post:
+      get:
         tags:
         - "gopigo"
         summary: "Move GoPiGo back without PID control"
@@ -224,7 +234,7 @@ paths:
           404:
             description: "motor_backward operation failed"
   /gopigo/motor/left:
-      post:
+      get:
         tags:
         - "gopigo"
         summary: "Turn GoPiGo Left slow (one motor off, better control)"
@@ -238,7 +248,7 @@ paths:
           404:
             description: "move left operation failed"
   /gopigo/motor/left_rotation:
-      post:
+      get:
         tags:
         - "gopigo"
         summary: "Rotate GoPiGo left in same position (both motors moving in the opposite direction)"
@@ -252,7 +262,7 @@ paths:
           404:
             description: "rotate left operation failed"
   /gopigo/motor/left_turn:
-      post:
+      get:
         tags:
         - "gopigo"
         summary: "turn x degrees to the left"
@@ -265,6 +275,8 @@ paths:
           required: true
           type: "integer"
           format: "int32"
+          minimum: 1
+          maximum: 360
         responses:
           200:
             description: "successful operation"
@@ -273,7 +285,7 @@ paths:
           404:
             description: "turn left x degrees failed"
   /gopigo/motor/left_turn_wait_for_completion:
-      post:
+      get:
         tags:
         - "gopigo"
         summary: "turn x degrees to the left, but blocking"
@@ -286,6 +298,8 @@ paths:
           required: true
           type: "integer"
           format: "int32"
+          minimum: 1
+          maximum: 360
         responses:
           200:
             description: "successful operation"
@@ -294,7 +308,7 @@ paths:
           404:
             description: "turn left x degrees waiting for completion failed"
   /gopigo/motor/right:
-      post:
+      get:
         tags:
         - "gopigo"
         summary: "Turn GoPiGo Right slow (one motor off, better control)"
@@ -308,7 +322,7 @@ paths:
           404:
             description: "move right operation failed"
   /gopigo/motor/right_rotation:
-      post:
+      get:
         tags:
         - "gopigo"
         summary: "Rotate GoPiGo right in same position (both motors moving in the opposite direction)"
@@ -322,7 +336,7 @@ paths:
           404:
             description: "rotate right operation failed"
   /gopigo/motor/right_turn:
-      post:
+      get:
         tags:
         - "gopigo"
         summary: "turn x degrees to the right"
@@ -335,6 +349,8 @@ paths:
           required: true
           type: "integer"
           format: "int32"
+          minimum: 1
+          maximum: 360
         responses:
           200:
             description: "successful operation"
@@ -343,7 +359,7 @@ paths:
           404:
             description: "turn right x degrees failed"
   /gopigo/motor/right_turn_wait_for_completion:
-      post:
+      get:
         tags:
         - "gopigo"
         summary: "turn x degrees to the right, but blocking"
@@ -356,6 +372,8 @@ paths:
           required: true
           type: "integer"
           format: "int32"
+          minimum: 1
+          maximum: 360
         responses:
           200:
             description: "successful operation"
@@ -364,7 +382,7 @@ paths:
           404:
             description: "turn right x degrees waiting for completion failed"
   /gopigo/motor/stop:
-      post:
+      get:
         tags:
         - "gopigo"
         summary: "Stop the GoPiGo"
@@ -409,6 +427,8 @@ paths:
         description: "Speed to set in both motors. Ranges from 0->255"
         type: "integer"
         format: "int32"
+        minimum: 0
+        maximum: 255
       responses:
         200:
           description: "successful operation"
@@ -533,6 +553,8 @@ definitions:
         type: "integer"
         description: "ID of the motor. 1=left, 2=right."
         format: "int32"
+        minimum: 1
+        maximum: 2
       speed:
         type: "integer"
         description: "Current motor speed."

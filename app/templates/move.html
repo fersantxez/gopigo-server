@@ -1,0 +1,41 @@
+{% extends "bootstrap/base.html" %}
+
+{% block head %}
+{{super()}}
+<link rel="icon" href="{{ url_for('static', filename = 'favicon.ico') }}">
+{% endblock %}
+
+{% block title %}GoPiGo server{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-inverse" role="navigation"> 
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle"
+			data-toggle="collapse" data-target=".navbar-collapse"> 
+				<span class="sr-only">Toggle navigation</span> 
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="/">GoPiGo Server</a> 
+		</div>
+		<div class="navbar-collapse collapse"> 
+			<ul class="nav navbar-nav">
+				<li><a href="{{ url_for('index') }}">Home</a></li>
+				<li><a href="{{ url_for('move') }}">Move</a></li>  
+			</ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="btn-group btn-group-justified">
+	<a href="/gopigo/motor/forward" class="btn btn-lg btn-success">Forward</a>
+	<a href="/gopigo/motor/backward" class="btn btn-lg btn-warning">Backward</a>
+	<a href="/gopigo/motor/left" class="btn btn-lg btn-primary">Left</a>
+	<a href="/gopigo/motor/right" class="btn btn-lg btn-info">Right</a>
+	<a href="/gopigo/motor/stop" class="btn btn-lg btn-danger">Stop</a>
+</div>
+{% endblock %}

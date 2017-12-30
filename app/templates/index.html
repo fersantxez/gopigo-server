@@ -1,0 +1,53 @@
+{% extends "bootstrap/base.html" %}
+
+{% block head %}
+{{super()}}
+<link rel="icon" href="{{ url_for('static', filename = 'favicon.ico') }}">
+{% endblock %}
+
+{% block title %}GoPiGo server{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-inverse" role="navigation"> 
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle"
+			data-toggle="collapse" data-target=".navbar-collapse"> 
+				<span class="sr-only">Toggle navigation</span> 
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="/">GoPiGo Server</a> 
+		</div>
+		<div class="navbar-collapse collapse"> 
+			<ul class="nav navbar-nav">
+				<li><a href="{{ url_for('index') }}">Home</a></li>
+				<li><a href="{{ url_for('move') }}">Move</a></li>  
+			</ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+	{{ super() }}
+	{{ moment.include_moment() }}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+	<div class="page-header">
+    	{% if (hostname and ip) %}
+        	GoPiGo server running on {{ hostname }} and listening on {{ ip }}
+    	{% else %}
+        	GoPiGo server (anonymous)
+		{% endif %}
+	</div>
+
+<p>The local date and time is {{ moment(current_time).format('LLL') }}.</p> 
+<p>That was {{ moment(current_time).fromNow(refresh=True) }}</p>
+{% endblock %}
+
+
+

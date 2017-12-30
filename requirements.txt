@@ -1,0 +1,5 @@
+flask
+flask-script
+flask-bootstrap
+flask-moment
+gopigo3
