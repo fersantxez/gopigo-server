@@ -1,11 +1,12 @@
 from app import app
 from flask import request, make_response, redirect, abort, render_template, url_for
-
 import socket
 from datetime import datetime
-
+import gopigo.I2C_mutex as I2C_mutex
+import gopigo.easygopigo3 as easyGPG
 import app.util as util
 #import app.forms as forms
+
 
 #Web UI
 @app.route('/')
@@ -14,11 +15,9 @@ def index():
 	'''
 	Homepage
 	'''
-	#	Uncomment when running on linux
-	#return render_template('index.html', hostname=socket.gethostname(), ip=util.get_default_iface_name_linux())
 	return render_template('index.html', 
 		hostname=socket.gethostname(), 
-		ip='127.0.0.1',
+		ip='127.0.0.1', #ip=util.get_default_iface_name_linux()
 		current_time=datetime.utcnow())
 
 @app.route('/move', methods=['GET', 'POST'])
@@ -33,6 +32,7 @@ def move():
 @app.route('/gopigo/motor/forward', methods=['GET'])
 def forward():
 	print('**DEBUG: FORWARD')
+	gpg.forward()
 	return redirect(url_for('move'))
 
 @app.route('/gopigo/motor/backward', methods=['GET'])
