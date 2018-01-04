@@ -2,10 +2,10 @@ from app import app
 from flask import request, make_response, redirect, abort, render_template, url_for
 import socket
 from datetime import datetime
-import gopigo.I2C_mutex as I2C_mutex
-import gopigo.easygopigo3 as easyGPG
 import app.util as util
 #import app.forms as forms
+
+import gopigo
 
 
 #Web UI
@@ -33,12 +33,13 @@ def move():
 @app.route('/gopigo/motor/forward', methods=['GET'])
 def forward():
 	print('**DEBUG: FORWARD')
-	gpg.forward()
+	gopigo.motor_fwd()
 	return redirect(url_for('move'))
 
 @app.route('/gopigo/motor/backward', methods=['GET'])
 def backward():
 	print('**DEBUG: BACKWARD')
+	gopigo.motor_bwd()
 	return redirect(url_for('move'))
 
 @app.route('/gopigo/motor/left', methods=['GET'])
@@ -54,6 +55,7 @@ def right():
 @app.route('/gopigo/motor/stop', methods=['GET'])
 def stop():
 	print('**DEBUG: STOP')
+	gopigo.stop()
 	return redirect(url_for('move'))
 
 #Error handlers
