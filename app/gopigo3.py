@@ -27,11 +27,13 @@ FIRMWARE_VERSION_REQUIRED = "0.3.x" # Make sure the top 2 of 3 numbers match
 
 if hardware_connected:
     GPG_SPI = spidev.SpiDev()
-    GPG_SPI.open(0, 1)
+    try:
+        GPG_SPI.open(0, 1)
+    except:
+        raise SystemExit('Error opening Spidev. Is the GoPiGo connected?')
     GPG_SPI.max_speed_hz = 500000
     GPG_SPI.mode = 0b00
     GPG_SPI.bits_per_word = 8
-
 
 class Enumeration(object):
     def __init__(self, names):  # or *names, with no .split()
