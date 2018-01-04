@@ -32,24 +32,50 @@ def move():
 #Motor movement
 @app.route('/gopigo/motor/forward', methods=['GET'])
 def forward():
-	print('**DEBUG: FORWARD')
-	gopigo.motor_fwd()
+	print('**DEBUG: FORWARD some cms')
+	gopigo.fwd()
+	return redirect(url_for('move'))
+
+@app.route('/gopigo/motor/motor_forward', methods=['GET'])
+def motor_forward():
+	print('**DEBUG: MOTOR_FORWARD')
+	gopigo.fwd()
 	return redirect(url_for('move'))
 
 @app.route('/gopigo/motor/backward', methods=['GET'])
 def backward():
-	print('**DEBUG: BACKWARD')
-	gopigo.motor_bwd()
+	print('**DEBUG: BACKWARD some cms')
+	gopigo.bwd()
 	return redirect(url_for('move'))
 
+@app.route('/gopigo/motor/motor_backward', methods=['GET'])
+def motor_backward():
+	print('**DEBUG: BACKWARD some cms')
+	gopigo.motor_bwd()
+	return redirect(url_for('move'))
+	
 @app.route('/gopigo/motor/left', methods=['GET'])
 def left():
 	print('**DEBUG: LEFT')
+	gopigo.left()
+	return redirect(url_for('move'))
+
+@app.route('/gopigo/motor/left_rotation', methods=['GET'])
+def left_rotation():
+	print('**DEBUG: LEFT ROTATION')
+	gopigo.left_rot()
 	return redirect(url_for('move'))
 
 @app.route('/gopigo/motor/right', methods=['GET'])
 def right():
 	print('**DEBUG: RIGHT')
+	gopigo.right()
+	return redirect(url_for('move'))
+	
+@app.route('/gopigo/motor/right_rotation', methods=['GET'])
+def right_rotation():
+	print('**DEBUG: RIGHT ROTATION')
+	gopigo.right_rot()
 	return redirect(url_for('move'))
 
 @app.route('/gopigo/motor/stop', methods=['GET'])
