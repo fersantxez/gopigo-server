@@ -1,18 +1,16 @@
-from flask_wtf import Form
-from wtforms import SubmitField
+from flask_wtf import FlaskForm
+from wtforms import IntegerField, SubmitField
+from wtforms.validators import NumberRange
 
-class MoveForm(Form):
-	form = Form()
-	if form.validate_on_submit():
-		if 'Forward' in request.form:
-			print('**DEBUG: forward')
-			flash('Forward')
-		elif 'Backward' in request.form:
-			flash('Backward')
-		elif 'Left' in request.form:
-			flash('Left')
-		elif 'Right' in request.form:
-			flash('Right')
-		elif 'Stop' in request.form:
-			flash('Stop')
-
+class FormForwardCms(FlaskForm):
+	forward_distance = IntegerField('Move fwd (cms)',[NumberRange(min=0, max=500)])
+	forward_submit = SubmitField('Submit')
+		
+class BackwardFormCms(FlaskForm):
+	pass
+	
+class RotateLeftDegrees(FlaskForm):
+	pass
+	
+class RotateRightDegrees(FlaskForm):
+	pass
