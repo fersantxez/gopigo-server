@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
-import gopigo.easygopigo3 as easyGPG
+import easygopigo3 as easyGPG
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
@@ -11,4 +11,4 @@ app.config.from_object('config')
 
 gopigo = easyGPG.EasyGoPiGo3()
 
-from app import routes
+from app import views

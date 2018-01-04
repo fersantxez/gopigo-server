@@ -17,7 +17,8 @@ def index():
 	'''
 	return render_template('index.html', 
 		hostname=socket.gethostname(), 
-		ip='127.0.0.1', #ip=util.get_default_iface_name_linux()
+		#ip='127.0.0.1', 
+		ip=util.get_default_iface_name_linux(),
 		current_time=datetime.utcnow())
 
 @app.route('/move', methods=['GET', 'POST'])

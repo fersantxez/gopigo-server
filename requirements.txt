@@ -2,4 +2,10 @@ flask
 flask-script
 flask-bootstrap
 flask-moment
+flask-WTF
+flask-login
+flask-sqlalchemy
+sqlalchemy-migrate
+flask-whooshalchemy
+
 gopigo3
