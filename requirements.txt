@@ -5,7 +5,9 @@ flask-moment
 flask-WTF
 flask-login
 flask-sqlalchemy
-sqlalchemy-migrate
+flask-migrate
 flask-whooshalchemy
 
 gopigo3
+rpi.gpio
+smbus-cffi
