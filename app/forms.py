@@ -32,10 +32,16 @@ class FormForwardCms(FlaskForm):
 	forward_submit = SubmitField('Submit')
 		
 class FormBackwardCms(FlaskForm):
-	pass
+	backward_distance = IntegerField('Move back (cms)',[NumberRange(min=0, max=500)])
+	backward_submit = SubmitField('Submit')
 	
-class FormRotateLeftDegrees(FlaskForm):
-	pass
+class FormLeftTurnDegrees(FlaskForm):
+	lturn_degrees = IntegerField('Turn left (degrees)',[NumberRange(min=0, max=360)])
+	lturn_submit = SubmitField('Submit')
+	
+class FormRightTurnDegrees(FlaskForm):
+	rturn_degrees = IntegerField('Turn right (degrees)',[NumberRange(min=0, max=360)])
+	rturn_submit = SubmitField('Submit')
 	
 class FormRotateRightDegrees(FlaskForm):
 	pass

@@ -20,6 +20,30 @@
             {{ formFW.forward_submit }}            
         </p>
     </form>
+    <form action="" method="POST">
+        {{ formBW.hidden_tag() }}
+        <p>
+            {{ formBW.backward_distance.label }}<br>
+            {{ formBW.backward_distance(size=2) }}
+            {{ formBW.backward_submit }}            
+        </p>
+    </form>
+    <form action="" method="POST">
+        {{ formLT.hidden_tag() }}
+        <p>
+            {{ formLT.lturn_degrees.label }}<br>
+            {{ formLT.lturn_degrees(size=2) }}
+            {{ formLT.lturn_submit }}            
+        </p>
+    </form>
+    <form action="" method="POST">
+        {{ formRT.hidden_tag() }}
+        <p>
+            {{ formRT.rturn_degrees.label }}<br>
+            {{ formRT.rturn_degrees(size=2) }}
+            {{ formRT.rturn_submit }}            
+        </p>
+    </form>
 </div>
 {% endblock %}
 

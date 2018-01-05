@@ -205,8 +205,10 @@ def motor_fwd():
 def bwd(dist=0):
 	try:
 		if dist>0:
-			# this casting to int doesn't seem necessary
-			pulse=int(PPR*(dist//WHEEL_CIRC) )
+			#pulse=int(PPR*(dist//WHEEL_CIRC) )
+			#TODO: fix this for accuracy
+			pulse=int(PPR*(dist/WHEEL_CIRC))+1
+			#print('**DEBUG: PPR is: {}, dist is {}, WHEEL_CIRC is {}, pulse is {}'.format(PPR, dist, WHEEL_CIRC, pulse))
 			enc_tgt(1,1,pulse)
 	except Exception as e:
 		print ("gopigo bwd: {}".format(e))
@@ -255,7 +257,8 @@ def turn_right_wait_for_completion(degrees):
 
 # turn x degrees to the left
 def turn_left(degrees):
-	pulse = int(degrees//DPR)
+	#pulse = int(degrees//DPR)
+	pulse = int(degrees/DPR)
 	enc_tgt(0,1,pulse)
 	left()
 

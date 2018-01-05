@@ -3,7 +3,7 @@ from flask import request, make_response, redirect, abort, render_template, url_
 import socket
 from datetime import datetime
 import app.util as util
-from app.forms import FormLogin, FormRegistration, FormForwardCms
+from app.forms import FormLogin, FormRegistration, FormForwardCms, FormBackwardCms, FormLeftTurnDegrees, FormRightTurnDegrees
 
 from flask_login import login_required, current_user, login_user, logout_user
 from app.models import User
@@ -67,16 +67,41 @@ def move():
 	Render interface for moving around the GoPiGo
 	'''
 	
-	form_forward_cms = FormForwardCms() 
+	form_fwd = FormForwardCms()
+	form_bwd = FormBackwardCms()
+	form_lt = FormLeftTurnDegrees()
+	form_rt = FormRightTurnDegrees()
 
-	if form_forward_cms.validate_on_submit():
-		dist = form_forward_cms.forward_distance.data #Integer
+	if form_fwd.validate_on_submit():
+		dist = form_fwd.forward_distance.data #Integer
 		if dist > 0:
 			flash('About to MOVE forward {} cms'.format(dist))
 			return redirect(url_for('forward', dist=dist))
 		return redirect(url_for('move'))
 
-	return render_template('move.html', formFW=form_forward_cms)
+	if form_bwd.validate_on_submit():
+		dist = form_bwd.backward_distance.data 
+		if dist > 0:
+			flash('About to MOVE backward {} cms'.format(dist))
+			return redirect(url_for('backward', dist=dist))
+		return redirect(url_for('move'))
+
+	if form_lt.validate_on_submit():
+		degrees = form_lt.lturn_degrees.data
+		if degrees > 0:
+			flash('About to TURN left {} degrees'.format(degrees))
+			return redirect(url_for('left_turn', degrees=degrees))
+		return redirect(url_for('move'))
+
+	if form_rt.validate_on_submit():
+		degrees = form_rt.rturn_degrees.data
+		if degrees > 0:
+			flash('About to TURN right {} degrees'.format(degrees))
+			return redirect(url_for('right_turn', degrees=degrees))
+		return redirect(url_for('move'))
+
+	return render_template('move.html', \
+		formFW=form_fwd, formBW=form_bwd, formLT=form_lt, formRT=form_rt)
 
 #Motor movement
 @app.route('/gopigo/motor/forward/<int:dist>', methods=['GET'])
@@ -95,12 +120,12 @@ def motor_forward():
 	gopigo.fwd()
 	return redirect(url_for('move'))
 
-@app.route('/gopigo/motor/backward', methods=['GET'])
+@app.route('/gopigo/motor/backward/<int:dist>', methods=['GET'])
 @login_required
-def backward():
-	print('**DEBUG: BACKWARD some cms')
-	flash('Moving backwards {} cms'.format( 10 ) )
-	gopigo.bwd()
+def backward(dist):
+	print('**DEBUG: BACKWARD {} cms'.format(dist))
+	flash('Moving backward {} cms'.format(dist))
+	gopigo.bwd(dist)
 	return redirect(url_for('move'))
 
 @app.route('/gopigo/motor/motor_backward', methods=['GET'])
@@ -127,6 +152,14 @@ def left_rotation():
 	gopigo.left_rot()
 	return redirect(url_for('move'))
 
+@app.route('/gopigo/motor/left_turn/<int:degrees>', methods=['GET'])
+@login_required
+def left_turn(degrees):
+	print('**DEBUG: TURN LEFT {} degrees'.format(degrees))
+	flash('Rotating Left {} degrees'.format(degrees))
+	gopigo.turn_left(degrees)
+	return redirect(url_for('move'))
+
 @app.route('/gopigo/motor/right', methods=['GET'])
 @login_required
 def right():
@@ -143,6 +176,14 @@ def right_rotation():
 	gopigo.right_rot()
 	return redirect(url_for('move'))
 
+@app.route('/gopigo/motor/right_turn/<int:degrees>', methods=['GET'])
+@login_required
+def right_turn(degrees):
+	print('**DEBUG: TURN RIGHT {} degrees'.format(degrees))
+	flash('Rotating Right {} degrees'.format(degrees))
+	gopigo.turn_right(degrees)
+	return redirect(url_for('move'))
+	
 @app.route('/gopigo/motor/stop', methods=['GET'])
 @login_required
 def stop():
