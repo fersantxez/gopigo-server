@@ -43,5 +43,5 @@ class FormRightTurnDegrees(FlaskForm):
 	rturn_degrees = IntegerField('Turn right (degrees)',[NumberRange(min=0, max=360)])
 	rturn_submit = SubmitField('Submit')
 	
-class FormRotateRightDegrees(FlaskForm):
-	pass
+class FormPic(FlaskForm):
+	pic_submit = SubmitField('Take Picture')

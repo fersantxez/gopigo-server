@@ -3,7 +3,7 @@ from flask import request, make_response, redirect, abort, render_template, url_
 import socket
 from datetime import datetime
 import app.util as util
-from app.forms import FormLogin, FormRegistration, FormForwardCms, FormBackwardCms, FormLeftTurnDegrees, FormRightTurnDegrees
+from app.forms import FormLogin, FormRegistration, FormForwardCms, FormBackwardCms, FormLeftTurnDegrees, FormRightTurnDegrees, FormPic
 
 from flask_login import login_required, current_user, login_user, logout_user
 from app.models import User
@@ -191,6 +191,27 @@ def stop():
 	flash('Stopped')
 	gopigo.stop()
 	return redirect(url_for('move'))
+
+@app.route('/gopigo/video', methods=['GET'])
+@login_required
+def video():
+	'''
+	Render interface for seeing with the GoPiGo.
+	A live cam with a button that allows to take a picture.
+	'''
+
+	form_pic = FormPic()
+
+	if form_pic.validate_on_submit():
+		#take a picture
+		print('**DEBUG: CLICK!!!')
+		return redirect(url_for('video'))
+
+	#Start streaming from the camera
+	
+
+	return render_template('video.html', \
+		formPic=form_pic)
 
 #Error handlers
 @app.errorhandler(404) 

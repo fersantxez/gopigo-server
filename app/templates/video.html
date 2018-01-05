@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-6">
+      <h2>LIVE video feed. Press Submit to Capture Pic</h2>
+		<div class="embed-responsive embed-responsive-16by9">
+			<iframe class="embed-responsive-item" src="//www.youtube.com/embed/ePbKGoIGAXY"></iframe>
+		</div>
+    </div>
+  </div>
+</div>
+<div class="container">
+	<div class="btn-group btn-group-justified">
+		<form action="" method="POST">
+			{{ formPic.hidden_tag() }}
+			<p>
+				{{ formPic.submit }}<br>          
+			</p>
+		</form>
+	</div>
+</div>
+{% endblock %}
