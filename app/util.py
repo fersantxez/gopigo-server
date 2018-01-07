@@ -1,12 +1,13 @@
 from subprocess import call
 import datetime
 import os.path
+import io #to write JPG to file as string
 
 import app
 from config import Config
 from .models import Document
 
-import picamera
+import picamera, camera
 
 def get_default_iface_name_linux():
     route = "/proc/net/route"
@@ -35,9 +36,7 @@ def sound(spk):
     print cmd_beg+spk+cmd_end
     call ([cmd_beg+spk+cmd_end], shell=True)
 
-    
-
-def takephoto():
+def take_photo():
     #Takes a picture from the camera
     #returns the full document object to be stored in DB with the file location
     date_string = str(datetime.datetime.now())
@@ -47,7 +46,6 @@ def takephoto():
     date_string = 'image'+date_string+'.jpg'
     date_string = date_string.replace(":", "")  # Strip out the colon from date time.
     date_string = date_string.replace(" ", "")  # Strip out the space from date time.
-    print(date_string)
     file_location = os.path.join(Config.MEDIA_FOLDER, date_string)
     camera.capture( file_location )
     camera.close()  # We need to close off the resources or we'll get an error.
@@ -55,7 +53,44 @@ def takephoto():
     #prepare full document inc. metadata for the picture
     document = Document(
         name=os.path.basename(file_location),   #keep extension: useful to look for it statically
-                                                #otherwise remove with: 
+                                                #otherwise remove with:
+                                                #os.path.splitext(filename)[0],
+        type="picture",
+        extension=os.path.splitext(file_location)[1],
+        size=os.path.getsize(file_location),
+        user_id="",  #out of scope of this module, fill in views
+        location=file_location,
+        body=""      #don't store in memory yet, in views it's filled from disk
+    )
+
+    return document
+
+def yield_video_frames(camera):
+    """Video streaming generator function."""
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+def take_photo_from_last_frame(camera):
+    """Creates a picture document with the last frame received in the camera"""
+    frame = camera.get_frame()
+    date_string = str(datetime.datetime.now())
+    date_string = 'image'+date_string+'.jpg'
+    date_string = date_string.replace(":", "")  # Strip out the colon from date time.
+    date_string = date_string.replace(" ", "")  # Strip out the space from date time.
+
+    #save frame to file for temp storage and display
+    file_location = os.path.join(Config.MEDIA_FOLDER, date_string)
+    print('**DEBUG: writing file to {}'.format(file_location))
+    with open (file_location, 'wb') as file:
+        file.write(frame)
+    file.close()
+    print('**DEBUG: written {}'.format(file_location))
+
+    document = Document(
+        name=os.path.basename(file_location),   #keep extension: useful to look for it statically
+                                                #otherwise remove with:
                                                 #os.path.splitext(filename)[0],
         type="picture",
         extension=os.path.splitext(file_location)[1],

@@ -9,7 +9,16 @@ class Config (object):
 		'sqlite:///' + os.path.join(basedir, 'app.db')
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
 	
-	STREAMING_TMP_DIR='/tmp/stream'
-	MJPG_LD_LIBRARY_PATH='/opt/mjpg-streamer'
-	MJPG_BIN='/opt/mjpg-streamer/mjpg_streamer'
-	MPJG_OPTS='-i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -p 9000 -w /opt/mjpg-streamer/www" > /dev/null 2>&1&'
+	#Working directories
+	BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+	MEDIA_FOLDER = os.path.join(BASE_DIR, 'app', 'static', 'media')	#for static content
+	print('**DEBUG: media folder is {}'.format(MEDIA_FOLDER))
+	#video configuration
+	CAMERA_RES_X = 640
+	CAMERA_RES_Y = 480
+	CAMERA_SHARPNESS = 100
+	#audio configuration
+
+	
+	
+	

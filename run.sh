@@ -3,16 +3,17 @@
 # gopigo-server: a Flask-based REST server to control a GoPiGo Robot
 # Author: Fernando Sanchez (fer@groundcontrol.me)
 
-#activate virtual environment
+#dev: activate virtual environment
 source venv/bin/activate
 
 #point Flask to the Main app
 export FLASK_APP=gopigo-server.py
-export FLASK_DEBUG=1
+export FLASK_DEBUG=0
 
-#ensure requirements are met
+
 #not needed on a virtual environment#
-#pip install -r requirements.txt
+# for other systems
+# sudo pip install -r requirements.txt
 
 #run
-flask run
+flask run --with-threads --host='0.0.0.0'

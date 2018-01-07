@@ -1,10 +1,13 @@
 from app import app, db
-from app.forms import FormLogin, FormRegistration, FormForwardCms, FormBackwardCms, FormLeftTurnDegrees, FormRightTurnDegrees, FormPic
+from app.forms import FormLogin, FormRegistration, FormForwardCms, FormBackwardCms, \
+	FormLeftTurnDegrees, FormRightTurnDegrees, FormPic
 from app.models import User
 import app.util as util
 from config import Config
+from camera import Camera
 
-from flask import request, make_response, redirect, abort, render_template, url_for, flash, session, send_from_directory
+from flask import request, make_response, redirect, abort, render_template, url_for, \
+	flash, session, send_from_directory, Response
 from flask_login import login_required, current_user, login_user, logout_user
 from werkzeug.urls import url_parse
 
@@ -21,8 +24,8 @@ def index():
 	'''
 	Homepage
 	'''
-	return render_template('index.html', 
-		hostname=gethostname(), 
+	return render_template('index.html',
+		hostname=gethostname(),
 		#ip='127.0.0.1',   #required if/when not running on linux
 		ip=util.get_default_iface_name_linux(),
 		current_time=datetime.utcnow()
@@ -91,7 +94,7 @@ def move():
 		return redirect(url_for('move'))
 
 	if form_bwd.validate_on_submit():
-		dist = form_bwd.backward_distance.data 
+		dist = form_bwd.backward_distance.data
 		if dist > 0:
 			flash('About to MOVE backward {} cms'.format(dist))
 			return redirect(url_for('backward', dist=dist))
@@ -215,9 +218,12 @@ def video():
 	form_pic = FormPic()
 
 	if form_pic.validate_on_submit():
+		#stop streaming from the camera to make it available for pictures
+
 		#take a picture and save it to disk
 		#return full dictionary with pic and metadata according to Model
-		document = util.takephoto()
+		#document = util.take_photo() #this is for camera only without streaming
+		document = util.take_photo_from_last_frame(Camera())
 		#set current user
 		document.user_id=current_user.id
 		#upload the body from location(file). Roll back the entire session if failure.
@@ -241,20 +247,23 @@ def video():
 			flash('ERROR deleting last picture', 'error')
 		last_pic_file=document.name
 		session['last_picture'] = document.name
-		return redirect(url_for('video', formPic=form_pic,
-			video_port=Config.VIDEO_STREAMING_PORT, last_picture=document.name))
+		return redirect(url_for('video', formPic=form_pic, last_picture=document.name))
 
 	#TODO:check whether the camera is present and the streaming SW is ready
 		#otherwise show processing message and install it if possible
 		#if success continue, otherwise redirect to index
 
-	#TODO: Start streaming from the camera
+	#Start streaming from the camera from the template
+	return render_template('video.html', formPic=form_pic, last_picture=session['last_picture'])
 
-	return render_template('video.html', formPic=form_pic, 
-		video_port=Config.VIDEO_STREAMING_PORT, last_picture=session['last_picture'])
+@app.route('/video_feed')
+def video_feed():
+    """Video streaming route. Put this in the src attribute of an img tag."""
+    return Response(util.yield_video_frames(Camera()),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 #Error handlers
-@app.errorhandler(404) 
+@app.errorhandler(404)
 def page_not_found(e):
 	return render_template('404.html'), 404
 

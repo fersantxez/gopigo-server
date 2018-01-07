@@ -8,6 +8,11 @@ flask-sqlalchemy
 flask-migrate
 flask-whooshalchemy
 
-gopigo3
+sqlalchemy_imageattach
+
+gopigo
 rpi.gpio
 smbus-cffi
+picamera
+threading
+io
