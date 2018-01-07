@@ -6,6 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 
+import os
+
 import gopigo
 
 app = Flask(__name__)
@@ -19,7 +21,13 @@ app.config.from_object(Config)
 #init Gopigo
 import atexit
 atexit.register(gopigo.stop)
-#/init
+
+#Initialize Base directory
+if not os.path.exists(Config.BASE_DIR):
+    os.makedirs(Config.BASE_DIR)
+#initialize Video and Audio directory
+if not os.path.exists(Config.MEDIA_FOLDER):
+    os.makedirs(Config.MEDIA_FOLDER)
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
