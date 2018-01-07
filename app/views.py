@@ -1,7 +1,7 @@
 from app import app, db
 from app.forms import FormLogin, FormRegistration, FormForwardCms, FormBackwardCms, \
 	FormLeftTurnDegrees, FormRightTurnDegrees, FormPic
-from app.models import User
+from app.models import User, Document
 import app.util as util
 from config import Config
 from camera import Camera
@@ -14,6 +14,7 @@ from werkzeug.urls import url_parse
 from datetime import datetime
 from socket import gethostname
 import os
+import random #random pics
 
 import gopigo
 
@@ -31,13 +32,32 @@ def index():
 		current_time=datetime.utcnow()
 		)
 
-#serve static files
-#assumes all files saved in Config.MEDIA_FOLDER/*
-#TODO: search for files in DB and send_or_404
 @app.route('/<path:filename>')
 def send_file(filename):
-	file = os.path.basename(filename)
-	return send_from_directory(Config.MEDIA_FOLDER,file)
+#serve static files
+#if it doesn't exist on MEDIA, search in DB and send_or_404
+	file_location = os.path.join(Config.MEDIA_FOLDER,filename)
+	if not os.path.exists(file_location):
+	#find "filename" in the Database
+		document = Document.query.filter_by(name=filename).first()
+		#document = get_object_or_404(Document, Document.name == filename)
+		#find in database and write body to STATIC directory
+		if document:
+			#if file doesnt exist, get it from DB (picture just taken not deleted yet)
+			try:
+				file = open(file_location, 'wb')
+				file.write(document.body)
+				file.close
+			except:
+				print('**DEBUG: Error opening file for writing')
+				flash('ERROR retrieving document {}'.format(filename), 'error')
+				raise IOError
+				abort(404)
+		else:
+			flash('Document {} NOT FOUND'.format(filename), 'error')
+			abort(404)
+	#return or 404
+	return send_from_directory(Config.MEDIA_FOLDER,filename)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -216,6 +236,8 @@ def video():
 	'''
 
 	form_pic = FormPic()
+	picture2 = None
+	picture3 = None
 
 	if form_pic.validate_on_submit():
 		#stop streaming from the camera to make it available for pictures
@@ -227,24 +249,17 @@ def video():
 		#set current user
 		document.user_id=current_user.id
 		#upload the body from location(file). Roll back the entire session if failure.
+		util.put_document_from_file(document)
+		flash( "Picture taken and stored! {}".format(document.name))
+
+		#delete previous "last picture" file from disk (its stored in DB)
 		try:
-			with open(document.location, 'rb') as input_file:
-				document.body = input_file.read()
-			input_file.close()
-			db.session.add(document)
-			db.session.commit()
-		except Exception:
-			db.session.rollback()
-			flash('ERROR uploading picture', 'error')
-			raise IOError
-		flash( "Picture taken! {}".format(document.name))
-		#delete previous file from disk (its stored in DB anyway)
-		try:
-			last_pic_location = os.path.join(Config.MEDIA_FOLDER, session['last_picture'])
-			os.remove(last_pic_location)
+			last_pic_location = os.path.join(Config.MEDIA_FOLDER, session.get('last_picture'))
+			if last_pic_location:
+				os.remove(last_pic_location)
 		except:
-			print('**ERROR: Unable to delete last picture {}'.format(last_pic_location))
-			flash('ERROR deleting last picture', 'error')
+			print('**ERROR: Unable to delete last picture')
+		#picture just taken is now the last picture
 		last_pic_file=document.name
 		session['last_picture'] = document.name
 		return redirect(url_for('video', formPic=form_pic, last_picture=document.name))
@@ -253,8 +268,19 @@ def video():
 		#otherwise show processing message and install it if possible
 		#if success continue, otherwise redirect to index
 
-	#Start streaming from the camera from the template
-	return render_template('video.html', formPic=form_pic, last_picture=session['last_picture'])
+	#get two random picture names from the DB for the frame
+	rand2 = random.randrange(0, db.session.query(Document).count()) 
+	picture2 = Document.query.get(rand2)
+	#picture2 = get_object_or_404(Document, Document.id==rand2)
+	rand3 = random.randrange(0, db.session.query(Document).count()) 
+	#picture3 = get_object_or_404(Document, Document.id==rand3)
+	picture3 = Document.query.get(rand3)
+
+	#Start streaming from the camera from the template including three thumbnails
+	return render_template('video.html', formPic=form_pic, 
+		last_picture=session.get('last_picture'),
+		picture2=picture2.name,
+		picture3=picture3.name)
 
 @app.route('/video_feed')
 def video_feed():

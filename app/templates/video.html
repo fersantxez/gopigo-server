@@ -16,22 +16,22 @@
    </div>
  </div>
  <div class="embed-responsive embed-responsive-16by9">
-	<iframe class="embed-responsive-item" src="http://localhost:{{video_port}}"></iframe>
+	<iframe class="embed-responsive-item" src="{{ url_for('video_feed') }}"></iframe>
 </div>
 {% if last_picture %}
 <div class="container-fluid">
   <div class="jumbotron">
   <h4>Previous pictures</h4>
     <div class="row vertical-align">
-      <div class="col-xs-4">
+      <div class="col-xs-3">
         <a href="#" title=""><img src="{{ url_for('send_file', filename=last_picture, _external=True ) }}" class="img-responsive" alt="Last Picture"></a>
       </div>
-    <div class="col-xs-4">
-        <a href="#" title=""><img src="{{ url_for('send_file', filename=last_picture, _external=True ) }}" class="img-responsive" class="img-responsive" alt="Last Picture"></a>
+    <div class="col-xs-3">
+        <a href="#" title=""><img src="{{ url_for('send_file', filename=picture2, _external=True ) }}" class="img-responsive" class="img-responsive" alt="Last Picture"></a>
     </div>
-    <div class="col-xs-4">
-        <a href="#" title=""><img src="{{ url_for('send_file', filename=last_picture, _external=True ) }}" class="img-responsive" class="img-responsive" alt="Last Picture"></a>
-    </div>    
+    <div class="col-xs-3">
+        <a href="#" title=""><img src="{{ url_for('send_file', filename=picture3, _external=True ) }}" class="img-responsive" class="img-responsive" alt="Last Picture"></a>
+    </div>
   </div>
 </div>
 </div>
