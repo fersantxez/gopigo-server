@@ -114,7 +114,10 @@ def take_photo_from_last_frame(camera):
 def yield_video_frames(camera):
     """Video streaming generator function."""
     while True:
-        frame = camera.get_frame()
+        try:
+            frame = camera.get_frame()
+        except IOError:
+            pass
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 

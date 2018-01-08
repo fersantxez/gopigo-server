@@ -8,8 +8,8 @@ source venv/bin/activate
 
 #point Flask to the Main app
 export FLASK_APP=gopigo-server.py
+#export FLASK_DEBUG=1
 export FLASK_DEBUG=0
-
 
 #not needed on a virtual environment#
 # for other systems

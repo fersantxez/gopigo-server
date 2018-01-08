@@ -12,12 +12,28 @@ class Config (object):
 	#Working directories
 	BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 	MEDIA_FOLDER = os.path.join(BASE_DIR, 'app', 'static', 'media')	#for static content
-	print('**DEBUG: media folder is {}'.format(MEDIA_FOLDER))
+
+	#storage configuration
+	STORAGE_TYPE = "local" #local , gcs , s3
+
 	#video configuration
-	CAMERA_RES_X = 640
-	CAMERA_RES_Y = 480
+	CAMERA_RES = "640x480"
 	CAMERA_SHARPNESS = 100
+	
+	#camera resolutions
+	CAMERA_RES_LIST=[
+	    ("1", "VGA"),
+	    ("2", "640x480"),
+	    ("3", "1024x768"),
+	    ("4", "1280x720"),
+	    ("5", "HD")
+	    ]
+
+
 	#audio configuration
+
+
+
 
 	
 	

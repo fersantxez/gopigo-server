@@ -1,6 +1,6 @@
 from app import app, db
 from app.forms import FormLogin, FormRegistration, FormForwardCms, FormBackwardCms, \
-	FormLeftTurnDegrees, FormRightTurnDegrees, FormPic
+	FormLeftTurnDegrees, FormRightTurnDegrees, FormPic, FormSettings
 from app.models import User, Document
 import app.util as util
 from config import Config
@@ -283,10 +283,31 @@ def video():
 		picture3=picture3.name)
 
 @app.route('/video_feed')
+@login_required
 def video_feed():
     """Video streaming route. Put this in the src attribute of an img tag."""
     return Response(util.yield_video_frames(Camera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+	"""Display the change settings page"""
+
+	form = FormSettings()
+
+	if form.validate_on_submit():
+
+		#update app configuration
+		new_resolution = Config.CAMERA_RES_LIST[int(form.camera_res.data)-1][1]
+											#-1: form starts in 1, array in 0 
+		Config.CAMERA_RES = new_resolution
+		Config.CAMERA_SHARPNESS = form.camera_sharpness.data
+		flash('Settings updated. New res: {} New sharp: {}'.format(\
+			Config.CAMERA_RES, Config.CAMERA_SHARPNESS, 'info'))
+		pass
+
+	return render_template('settings.html', title='Settings', form=form)
 
 #Error handlers
 @app.errorhandler(404)
