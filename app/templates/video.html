@@ -24,13 +24,13 @@
   <h4>Previous pictures</h4>
     <div class="row vertical-align">
       <div class="col-xs-3">
-        <a href="#" title=""><img src="{{ url_for('send_file', filename=last_picture, _external=True ) }}" class="img-responsive" alt="Last Picture"></a>
+        <a href={{ last_picture }} title=""><img src="{{ url_for('send_file', filename=last_picture, _external=True ) }}" class="img-responsive" alt="Last Picture"></a>
       </div>
     <div class="col-xs-3">
-        <a href="#" title=""><img src="{{ url_for('send_file', filename=picture2, _external=True ) }}" class="img-responsive" class="img-responsive" alt="Last Picture"></a>
+        <a href={{ picture2 }} title=""><img src="{{ url_for('send_file', filename=picture2, _external=True ) }}" class="img-responsive" class="img-responsive" alt="Last Picture"></a>
     </div>
     <div class="col-xs-3">
-        <a href="#" title=""><img src="{{ url_for('send_file', filename=picture3, _external=True ) }}" class="img-responsive" class="img-responsive" alt="Last Picture"></a>
+        <a href={{ picture3 }} title=""><img src="{{ url_for('send_file', filename=picture3, _external=True ) }}" class="img-responsive" class="img-responsive" alt="Last Picture"></a>
     </div>
   </div>
 </div>
