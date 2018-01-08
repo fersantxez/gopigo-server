@@ -13,6 +13,9 @@ class Config (object):
 	BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 	MEDIA_FOLDER = os.path.join(BASE_DIR, 'app', 'static', 'media')	#for static content
 
+	#APP RUN OPTIONS
+	APP_RUN_OPTS= "threaded=True"
+
 	#storage configuration
 	STORAGE_TYPE = "local" #local , gcs , s3
 
