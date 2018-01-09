@@ -16,7 +16,7 @@ class User(UserMixin, db.Model):
 		return check_password_hash(self.password_hash, password)
 		
 	def __repr__(self):
-		return '<User {}><email {}><password_hash {}>'.format(self.username,self.email,self.password_hash)    
+		return '<User {}><email {}><password_hash {}>'.format(self.username,self.email,self.password_hash)
 
 #class Document
 #document in database, models the metadata for a captured document
@@ -32,8 +32,7 @@ class Document(db.Model):
 	body = db.Column(db.LargeBinary)
 
 	def __repr__(self):
-		return '<Document {}><Name {}><Type {}><Size {}>'.format(
-			self.body, self.name, self.type, self.size)
+		return '<Name {}><Type {}><Size {}>'.format(self.name, self.type, self.size)
 
 @login.user_loader
 def load_user(id):

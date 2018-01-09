@@ -3,7 +3,6 @@
 /doc
 /__pycache__
 /app.db
-/app/static/media
 /*.pyc
 /app/*.pyc
 

@@ -40,7 +40,6 @@ def send_file(filename):
 	if not os.path.exists(file_location):
 	#find "filename" in the Database
 		document = Document.query.filter_by(name=filename).first()
-		#document = get_object_or_404(Document, Document.name == filename)
 		#find in database and write body to STATIC directory
 		if document:
 			#if file doesnt exist, get it from DB (picture just taken not deleted yet)
@@ -56,7 +55,7 @@ def send_file(filename):
 		else:
 			flash('Document {} NOT FOUND'.format(filename), 'error')
 			abort(404)
-	#return or 404
+
 	return send_from_directory(Config.MEDIA_FOLDER,filename)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -239,17 +238,16 @@ def video():
 	picture2 = None
 	picture3 = None
 
+
 	if form_pic.validate_on_submit():
 		#stop streaming from the camera to make it available for pictures
 
 		#take a picture and save it to disk
 		#return full dictionary with pic and metadata according to Model
 		#document = util.take_photo() #this is for camera only without streaming
-		document = util.take_photo_from_last_frame(Camera())
-		#set current user
-		document.user_id=current_user.id
-		#upload the body from location(file). Roll back the entire session if failure.
-		util.put_document_from_file(document)
+		pic_location = util.take_photo_from_last_frame(Camera())
+		#Create the document in the database from the file
+		document = util.create_document_from_file(pic_location, "picture", current_user.id )
 		flash( "Picture taken and stored! {}".format(document.name))
 
 		#delete previous "last picture" file from disk (its stored in DB)
@@ -268,19 +266,29 @@ def video():
 		#otherwise show processing message and install it if possible
 		#if success continue, otherwise redirect to index
 
-	#get two random picture names from the DB for the frame
-	rand2 = random.randrange(0, db.session.query(Document).count()) 
-	picture2 = Document.query.get(rand2)
-	#picture2 = get_object_or_404(Document, Document.id==rand2)
-	rand3 = random.randrange(0, db.session.query(Document).count()) 
-	#picture3 = get_object_or_404(Document, Document.id==rand3)
-	picture3 = Document.query.get(rand3)
+	#see if there are pictures to display in the database
+	if db.session.query(Document).count() > 3:
+		#get two random picture names from the DB for the frame
+		rand2 = random.randrange(1, db.session.query(Document).count())
+		print('**DEBUG: rand is {}'.format(rand2))
+		picture2 = Document.query.get(rand2)
+		picture2 = picture2.name
+		print('**DEBUG: document {} is {}'.format(rand, picture2.name))
+		rand3 = random.randrange(1, db.session.query(Document).count()) 
+		picture3 = Document.query.get(rand3)
+		picture3 = picture3.name
+
+	else:
+		session['last_picture'] = Config.EMPTY_PICTURE
+		picture2 = Config.EMPTY_PICTURE
+		picture3 = Config.EMPTY_PICTURE
 
 	#Start streaming from the camera from the template including three thumbnails
 	return render_template('video.html', formPic=form_pic, 
 		last_picture=session.get('last_picture'),
-		picture2=picture2.name,
-		picture3=picture3.name)
+		picture2=picture2,
+		picture3=picture3)
+
 
 @app.route('/video_feed')
 @login_required
@@ -317,3 +325,4 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server_error(e):
 	return render_template('500.html'), 500
+

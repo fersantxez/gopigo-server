@@ -5,13 +5,13 @@
 from config import Config
 from app import db
 from app.models import User, Document
+from app.util import create_document_from_file
 
 import argparse, os
 from sys import exit
 #import logging
 #from logging.handlers import RotatingFileHandler
 
-DATABASE_FILE_NAME = "app.db"
 
 if __name__ == "__main__":
 
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 	args = vars(parser.parse_args())
 
 	#check that the database does not exist
-	if os.path.exists( os.path.join( os.getcwd(),DATABASE_FILE_NAME )):
+	if os.path.exists( os.path.join( os.getcwd(), Config.DATABASE_FILE_NAME )):
 		print('**DEBUG: DATABASE EXISTS. EXITING')
 		#app.logger.error('Database exists. Exiting')
 		exit(1)
@@ -47,8 +47,17 @@ if __name__ == "__main__":
 
 	db.session.add(admin_user)
 	#app.logger.info('Added user {}'.format(admin_user.username))
-
 	db.session.commit()
+
+	#create three pictures with the default icon
+	for i in range(1,4):
+		document = create_document_from_file( Config.EMPTY_PICTURE, type="picture", user_id=admin_user.id )
+		if document:
+			print("**DEBUG: Created document {} with name {}".format(document.id, document.name))
+		else:
+			print("**ERROR creating document {}".format(i))
+
+
 
 
 

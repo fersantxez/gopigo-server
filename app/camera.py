@@ -1,7 +1,7 @@
 import io
 import time
 import picamera
-from base_camera import BaseCamera
+from .base_camera import BaseCamera
 from config import Config
 
 class Camera(BaseCamera):
@@ -11,7 +11,7 @@ class Camera(BaseCamera):
             # let camera warm up
             time.sleep(2)
 
-            camera.resolution = (Config.CAMERA_RES_X, Config.CAMERA_RES_Y)
+            camera.resolution = Config.CAMERA_RES
             camera.sharpness = Config.CAMERA_SHARPNESS
             stream = io.BytesIO()
             for _ in camera.capture_continuous(stream, 'jpeg',
