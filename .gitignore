@@ -1,0 +1,8 @@
+/gopigoserver.geany
+/venv
+/doc
+/__pycache__
+/app.db
+/*.pyc
+/app/*.pyc
+

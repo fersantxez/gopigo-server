@@ -1,7 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, IntegerField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, IntegerField, \
+ SubmitField, SelectField
 from wtforms.validators import NumberRange, DataRequired, Email, EqualTo
 
+from config import Config
+from app.models import User, Document
 
 class FormLogin(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -43,5 +46,10 @@ class FormRightTurnDegrees(FlaskForm):
 	rturn_degrees = IntegerField('Turn right (degrees)',[NumberRange(min=0, max=360)])
 	rturn_submit = SubmitField('Submit')
 	
-class FormRotateRightDegrees(FlaskForm):
-	pass
+class FormPic(FlaskForm):
+	pic_submit = SubmitField('Take Picture')
+
+class FormSettings(FlaskForm):
+    camera_res = SelectField('Camera Resolution (horizontal)',choices=Config.CAMERA_RES_LIST)
+    camera_sharpness = IntegerField('Camera Sharpness (-100 to 100)', [NumberRange(min=-100, max=100)])
+    submit = SubmitField('Submit')

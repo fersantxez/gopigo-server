@@ -8,6 +8,11 @@ flask-sqlalchemy
 flask-migrate
 flask-whooshalchemy
 
-gopigo3
+#sqlalchemy_imageattach
+
+#gopigo		#directly copying the modified version in /app
 rpi.gpio
-smbus-cffi
+smbus-cffi	#not needed for gopigo?
+picamera
+#threading 	#already included in standard library
+#io		#standard
