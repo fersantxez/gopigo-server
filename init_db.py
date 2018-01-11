@@ -19,8 +19,8 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Initialize the gopigo-server database and add an initial Superuser with password', \
 		usage='init_db.py -u [USERNAME] -p [PASSWORD]'
 		)
-	parser.add_argument('-u', '--username', help='username to login with', required=True)
-	parser.add_argument('-p', '--password', help='password to login with', required=True)
+	parser.add_argument('-u', '--username', help='username to login with', required=False)
+	parser.add_argument('-p', '--password', help='password to login with', required=False)
 	args = vars(parser.parse_args())
 
 	#check that the database does not exist
@@ -32,12 +32,17 @@ if __name__ == "__main__":
 	db.create_all()
 	#app.logger.info('Database created')
 
-	print('**DEBUG: about to create a Superuser named {} with password {}'.format(args.get('username'), args.get('password')))
+
+	#if arguments were not passed, ask for them interactively
+	username = args.get('username') or raw_input("Please enter username to initialize the App with: ")
+	password = args.get('password') or raw_input("Please enter password for user {}: ".format(username))		
+
+	print('**DEBUG: about to create a Superuser named {} with password {}'.format(username, password))
 	#app.logger.info('About to create a Superuser named {} with password {}'.format(args.get('username'), args.get('password')))
 	admin_user = User( 
-		username=args.get('username'),
+		username=username,
 		)
-	admin_user.set_password(args.get('password'))
+	admin_user.set_password(password)
 
 	#Look for user in db
 	if User.query.filter_by(username=admin_user.username).first():

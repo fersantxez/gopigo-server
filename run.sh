@@ -4,15 +4,20 @@
 # Author: Fernando Sanchez (fer@groundcontrol.me)
 
 export VENV_DIR=${PWD}"/venv"
+export DB_FILENAME=${PWD}/app.db
+export INIT_DB=${PWD}/init_db.py
 
 if [ ! -d "$VENV_DIR" ]; then
 	virtualenv $VENV_DIR
 fi
 #not needed on a virtual environment#
 # for other systems
-source ${VENV_DIR}/bin/activate
 sudo pip install -r requirements.txt
-
+source ${VENV_DIR}/bin/activate
+#if DB dos not exist, initialize it
+if [ ! -f "${DB_FILENAME}" ]; then
+	${INIT_DB}
+fi 
 
 #point Flask to the Main app
 export FLASK_APP=gopigo-server.py
