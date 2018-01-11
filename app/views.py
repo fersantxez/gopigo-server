@@ -251,12 +251,12 @@ def video():
 		flash( "Picture taken and stored! {}".format(document.name))
 
 		#delete previous "last picture" file from disk (its stored in DB)
-		try:
-			last_pic_location = os.path.join(Config.MEDIA_FOLDER, session.get('last_picture'))
-			if last_pic_location:
-				os.remove(last_pic_location)
-		except:
-			print('**ERROR: Unable to delete last picture')
+		#try:
+		#	last_pic_location = os.path.join(Config.MEDIA_FOLDER, session.get('last_picture'))
+		#	if last_pic_location:
+		#		os.remove(last_pic_location)
+		#except:
+		#	print('**ERROR: Unable to delete last picture')
 		#picture just taken is now the last picture
 		last_pic_file=document.name
 		session['last_picture'] = document.name
@@ -271,17 +271,18 @@ def video():
 		#get two random picture names from the DB for the frame
 		rand2 = random.randrange(1, db.session.query(Document).count())
 		print('**DEBUG: rand is {}'.format(rand2))
-		picture2 = Document.query.get(rand2)
-		picture2 = picture2.name
-		print('**DEBUG: document {} is {}'.format(rand, picture2.name))
+		document2 = Document.query.get(rand2)
+		picture2 = document2.name
+		print('**DEBUG: document {} is {}'.format(rand2, picture2))
 		rand3 = random.randrange(1, db.session.query(Document).count()) 
-		picture3 = Document.query.get(rand3)
-		picture3 = picture3.name
+		document3 = Document.query.get(rand3)
+		picture3 = document3.name
 
 	else:
-		session['last_picture'] = Config.EMPTY_PICTURE
-		picture2 = Config.EMPTY_PICTURE
-		picture3 = Config.EMPTY_PICTURE
+		session['last_picture'] = os.path.basename(Config.EMPTY_PICTURE)
+		picture2 = session['last_picture']
+		picture3 = session['last_picture']
+		print('**DEBUG: ALL 3 pictures are {}'.format(Config.EMPTY_PICTURE))
 
 	#Start streaming from the camera from the template including three thumbnails
 	return render_template('video.html', formPic=form_pic, 

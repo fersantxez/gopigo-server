@@ -13,8 +13,16 @@ class Config (object):
 	BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 	MEDIA_FOLDER = os.path.join(BASE_DIR, 'app', 'static', 'media')	#for static content
 
+	DATABASE_FILE_NAME = "app.db"
+	EMPTY_PICTURE= os.path.join(MEDIA_FOLDER, 'dex-advanced.png')
+
+	PORT = "5001"
 	#APP RUN OPTIONS
-	APP_RUN_OPTS= "threaded=True"
+	APP_RUN_OPTS= [
+		"threaded=True",
+		"host=0.0.0.0",
+		"port="+PORT
+		]
 
 	#storage configuration
 	STORAGE_TYPE = "local" #local , gcs , s3
