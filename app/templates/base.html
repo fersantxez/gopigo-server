@@ -7,6 +7,8 @@
 
 {% block title %}GoPiGo server{% endblock %}
 
+
+
 {% block navbar %}
 <div class="navbar navbar-inverse" role="navigation"> 
 	<div class="container">
@@ -37,13 +39,17 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
- {% for message in get_flashed_messages() %}
- <div class="alert alert-warning">
- <button type="button" class="close" data-dismiss="alert">&times;</button>
- {{ message }}
- </div>
- {% endfor %}
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
  {% block page_content %}{% endblock %}
-</div>
+
 {% endblock %}

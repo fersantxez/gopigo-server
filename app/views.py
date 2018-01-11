@@ -89,7 +89,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Added user {} with email {}!'.format(username, email))
+        flash('Added user {} with email {}!'.format(user.username, user.email))
         return redirect(url_for('index'))
     return render_template('register.html', title='Add User', form=form)
 
