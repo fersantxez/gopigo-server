@@ -11,7 +11,7 @@ fi
 #not needed on a virtual environment#
 # for other systems
 source ${VENV_DIR}/bin/activate
-#sudo pip install -r requirements.txt
+sudo pip install -r requirements.txt
 
 
 #point Flask to the Main app
