@@ -45,44 +45,37 @@ def filename_from_date():
 
     return date_string    
 
-def document_from_file( file_path, filetype ):
-    """creates an object with all the metadata"""
+def create_document_from_file( path, type, user_id ):
+    """creates an object with all the metadata from a file.
+    Uploads it to the database as a full object"""
 
-    document = Document(
-        name=os.path.basename(file_path),   #keep extension: useful to look for it statically
-                                                #otherwise remove with:
-                                                #os.path.splitext(filename)[0],
-        type=filetype,
-        extension=os.path.splitext(file_path)[1],
-        size=os.path.getsize(file_path),
-        user_id="",  #out of scope of this module, fill in views
-        location=file_path,
-        body=""      #don't store in memory yet, in views it's filled from disk
-    )
-
-    return document
-
-def put_document_from_file(document):
-    """uploads to the database the body of a document from file.
-    Deletes the file from disk if successful"""
     try:
-        with open(document.location, 'rb') as input_file:
-            document.body = input_file.read()
+        with open(path, 'rb') as input_file:
+            document = Document(
+                name=os.path.basename(path),   #keep extension: useful to look for it statically
+                                                        #otherwise remove with:
+                                                        #os.path.splitext(filename)[0],
+                type=type,
+                extension=os.path.splitext(path)[1],
+                size=os.path.getsize(path),
+                user_id=user_id,  
+                location=path,
+                body=input_file.read()
+                )
         input_file.close()
         db.session.add(document)
         db.session.commit()
-        if os.path.exists(document.location):
-                os.remove(document.location)
-    except Exception:
-        db.session.rollback()
-        flash('ERROR uploading document', 'error')
-        raise IOError
+        #os.remove(document.location)   #this breaks creating in bulk, plus doesnt really make sense
+        return document
 
-    return document.location
+    except Exception as exc:
+        db.session.rollback()
+        print('ERROR uploading document {}: {}'.format(path, str(exc)), 'error')
+
 
 def take_photo():
     #Takes a picture from the camera
-    #returns the full document object to be stored in DB with the file location
+    #returns the location of the file created. 
     #this is BLOCKING so it can't be used simultaneously with the streaming. For 
     #that, use take_photo_from_last_frame below
     date_string = str(datetime.datetime.now())
@@ -92,11 +85,9 @@ def take_photo():
     file_location = os.path.join(Config.MEDIA_FOLDER, filename_from_date)
     camera.capture( file_location )
     camera.close()  # We need to close off the resources or we'll get an error.
-    #prepare full document inc. metadata for the picture
-    document = document_from_file( file_location, "picture" )
 
-    return document
-
+    return file_location
+    
 def take_photo_from_last_frame(camera):
     """Creates a picture document with the last frame received in the camera"""
     frame = camera.get_frame()
@@ -107,9 +98,8 @@ def take_photo_from_last_frame(camera):
         file.write(frame)
     file.close()
     print('**DEBUG: written {}'.format(file_location))
-    document = document_from_file( file_location, "picture" )
 
-    return document
+    return file_location
 
 def yield_video_frames(camera):
     """Video streaming generator function."""
