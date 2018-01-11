@@ -10,8 +10,8 @@ if [ ! -d "$VENV_DIR" ]; then
 fi
 #not needed on a virtual environment#
 # for other systems
-source ${VNENV_DIR}/bin/activate
-sudo pip install -r requirements.txt
+source ${VENV_DIR}/bin/activate
+#sudo pip install -r requirements.txt
 
 
 #point Flask to the Main app
