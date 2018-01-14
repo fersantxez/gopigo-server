@@ -21,7 +21,8 @@ class Config (object):
 	APP_RUN_OPTS= [
 		"threaded=True",
 		"host=0.0.0.0",
-		"port="+PORT
+		"port="+PORT,
+		"debug"=Falses
 		]
 
 	#storage configuration
@@ -39,6 +40,17 @@ class Config (object):
 	    ("4", "1280x720"),
 	    ("5", "HD")
 	    ]
+
+	OAUTH_CREDENTIALS = {
+	    'facebook': {
+	        'id': '174382259821684',
+	        'secret': 'f4f12aa679f5d946db308f2d3bf02149'
+	    },
+	    'twitter': {
+	        'id': '8rqcSmq71bqauxC3opXQNZsjp',
+	        'secret': 'nBniFqPRIHz1xUpkjcwgc1WvTqncOWPk6gh3U5HpgLp2g9WjaA'
+	    }
+	}
 
 
 	#audio configuration
