@@ -1,0 +1,10 @@
+<table>
+    <tr valign="top">
+        <td><img src="{{ document.author.avatar(50) }}"></td>
+        <td>
+        	<i>{{ document.author.username }} got:</i>
+        	<br>
+        	<a href={{ document.name }} title=""><img src="{{ url_for('send_file', filename=document.name, _external=True ) }}" class="img-responsive" class="img-responsive" alt="Document by {{ document.author.username }}"></a>
+        </td>
+    </tr>
+</table>

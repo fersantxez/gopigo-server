@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, IntegerField, \
- SubmitField, SelectField
-from wtforms.validators import NumberRange, DataRequired, Email, EqualTo
+ SubmitField, SelectField, TextAreaField
+from wtforms.validators import NumberRange, DataRequired, Email, EqualTo, Length
 
 from config import Config
 from app.models import User, Document
@@ -53,3 +53,7 @@ class FormSettings(FlaskForm):
     camera_res = SelectField('Camera Resolution (horizontal)',choices=Config.CAMERA_RES_LIST)
     camera_sharpness = IntegerField('Camera Sharpness (-100 to 100)', [NumberRange(min=-100, max=100)])
     submit = SubmitField('Submit')
+
+class FormEdit(FlaskForm):
+    username = StringField('username', validators=[DataRequired()])
+    about_me = TextAreaField('about_me', validators=[Length(min=0, max=140)])
