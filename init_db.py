@@ -41,6 +41,9 @@ if __name__ == "__main__":
 	#app.logger.info('About to create a Superuser named {} with password {}'.format(args.get('username'), args.get('password')))
 	admin_user = User( 
 		username=username,
+		social_id="fake_social_id",
+		email="fake@email.com",
+		about_me="Pre-generated admin user"
 		)
 	admin_user.set_password(password)
 
