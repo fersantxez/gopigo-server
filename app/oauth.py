@@ -71,12 +71,12 @@ class FacebookSignIn(OAuthSignIn):
         #in case facebook does not provide email
         if not me.get('email'):
             #make it up putting together the name
-            me['email'] = username +'@facebook.com'
+            me['email'] = username +'@facebook'
         return (
             'facebook$' + me['id'], #callback returns social_id, username, email
             username,         #use "name" as "username"
             me.get('email')
-        )
+            )
 
 class TwitterSignIn(OAuthSignIn):
     def __init__(self):
@@ -114,8 +114,11 @@ class TwitterSignIn(OAuthSignIn):
         #in case Twitter does not provide email
         if not me.get('email'):
             #make it up putting together the name
-            me['email'] = username +'@twitter.com'
-        return social_id, username, me.get('email')   # Twitter does not provide email
+            me['email'] = username +'@twitter'
+        return (social_id,
+                username, 
+                me.get('email')   # Twitter does not provide email
+                )
 
 class GoogleSignIn(OAuthSignIn):
     """Shamelessly copied from https://github.com/heroku/heroku-airflow/blob/master/airflow_login/airflow_auth.py"""

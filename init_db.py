@@ -42,7 +42,7 @@ if __name__ == "__main__":
 	admin_user = User( 
 		username=username,
 		social_id="fake_social_id",
-		email="fake@email.com",
+		email="Admin User",
 		about_me="Pre-generated admin user"
 		)
 	admin_user.set_password(password)

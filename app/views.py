@@ -38,23 +38,23 @@ def index():
 #Before login, set current user
 @app.before_request
 def before_request():
-    g.user = current_user
-    if g.user.is_authenticated:
-        g.user.last_seen = datetime.utcnow() #update "last seen"
-        db.session.add(g.user)
-        db.session.commit()
+	g.user = current_user
+	if g.user.is_authenticated:
+		g.user.last_seen = datetime.utcnow() #update "last seen"
+		db.session.add(g.user)
+		db.session.commit()
 
 #Login Manager
 @login.user_loader
 def load_user(id):
-    return User.query.get(int(id))
+	return User.query.get(int(id))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = FormLogin()
-    if form.validate_on_submit():
+	if current_user.is_authenticated:
+		return redirect(url_for('index'))
+	form = FormLogin()
+	if form.validate_on_submit():
 		user = User.query.filter_by(username=form.username.data).first()
 		if user is None or not user.check_password(form.password.data):
 			flash('Invalid username or password')
@@ -64,70 +64,82 @@ def login():
 		if not next_page or url_parse(next_page).netloc != '':
 			next_page = url_for('index')
 		return redirect(next_page)
-    return render_template('login.html', title='Sign In', form=form)
+	return render_template('login.html', title='Sign In', form=form)
 
 @app.route('/logout')
 def logout():
-    logout_user()
-    return redirect(url_for('index'))
+	logout_user()
+	return redirect(url_for('index'))
 
 #authorize with Oauth through .oauth's OAuthSignIn
 @app.route('/authorize/<provider>')
 def oauth_authorize(provider):
-    if not current_user.is_anonymous:
-        return redirect(url_for('index'))
-    oauth = OAuthSignIn.get_provider(provider)
-    return oauth.authorize()
+	if not current_user.is_anonymous:
+		return redirect(url_for('index'))
+	oauth = OAuthSignIn.get_provider(provider)
+	return oauth.authorize()
 
 #callback from OAuth provider
 @app.route('/callback/<provider>')
 def oauth_callback(provider):
-    if not current_user.is_anonymous:
-        return redirect(url_for('index'))
-    oauth = OAuthSignIn.get_provider(provider)
-    social_id, username, email = oauth.callback()
-    if social_id is None:
-        flash('Authentication failed.')
-        return redirect(url_for('index'))
-    user = User.query.filter_by(social_id=social_id).first()
-    if not user:
-        user = User(social_id=social_id, username=username, email=email)
-        db.session.add(user)
-        db.session.commit()
-    login_user(user, True)
-    return redirect(url_for('index'))
+	error=None
+	if not current_user.is_anonymous:
+		return redirect(url_for('index'))
+	oauth = OAuthSignIn.get_provider(provider)
+	social_id, username, email = oauth.callback()
+	if social_id is None:
+		flash('Authentication failed.')
+		return redirect(url_for('index'))
+	user = User.query.filter_by(email=email).first() #find the user by email in dB
+	if not user:
+		print('**DEBUG: User NOT found in the database')
+		flash('User {} not found. Contact your administrator to get it registered'.format( email ), 'error')
+		#this code below creates the user if it's not in the dB yet
+		#user = User(social_id=social_id, username=username, email=email)
+		#db.session.add(user)
+		#db.session.commit()
+		#login_user(user, True)
+		return redirect(url_for('login'))
+	else:
+		print('**DEBUG: User FOUND in the database as {}'.format(user))
+		#update user
+		user.social_id=social_id
+		user.username=username
+		db.session.commit()
+		login_user(user, True)
+		return redirect(url_for('index'))
 
 #profile pages
 @app.route('/user/<username>')
 @login_required
 def user(username):
-    user = User.query.filter_by(username=username).first()
-    if user == None:
-        flash('User %s not found.' % username)
-        return redirect(url_for('index'))
-    documents = [
-        ##TODO: generate a few documents for the profile page
-    ]
-    return render_template('user.html',
-                           user=user,
-                           documents=documents)
+	user = User.query.filter_by(username=username).first()
+	if user == None:
+		flash('User %s not found.' % username)
+		return redirect(url_for('index'))
+	documents = [
+		##TODO: generate a few documents for the profile page
+	]
+	return render_template('user.html',
+							user=user,
+							documents=documents)
 
 #edit profile page
 @app.route('/edit', methods=['GET', 'POST'])
 @login_required
 def edit():
-    form = FormEdit()
-    if form.validate_on_submit():
-        g.user.username = form.username.data
-        g.user.about_me = form.about_me.data
-        db.session.add(g.user)
-        db.session.commit()
-        flash('Your changes have been saved.')
-        return redirect(url_for('edit'))
-    else:
-        form.username.data = g.user.username
-        form.about_me.data = g.user.about_me
-    return render_template('edit.html', form=form)
+	form = FormEdit()
+	if form.validate_on_submit():
+		g.user.username = form.username.data
+		g.user.about_me = form.about_me.data
+		db.session.add(g.user)
+		db.session.commit()
+		flash('Your changes have been saved.')
+		return redirect(url_for('edit'))
+	else:
+		form.username.data = g.user.username
+		form.about_me.data = g.user.about_me
+	return render_template('edit.html', form=form)
 
 #serve static files
 @app.route('/<path:filename>')
@@ -160,7 +172,8 @@ def send_file(filename):
 def register():
     form = FormRegistration()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
+        user = User(username=form.username.data, 
+        	email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -369,9 +382,9 @@ def video():
 @app.route('/video_feed')
 @login_required
 def video_feed():
-    """Video streaming route. Put this in the src attribute of an img tag."""
-    return Response(util.yield_video_frames(Camera()),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+	"""Video streaming route. Put this in the src attribute of an img tag."""
+	return Response(util.yield_video_frames(Camera()),
+					mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/settings', methods=['GET', 'POST'])
 @login_required
