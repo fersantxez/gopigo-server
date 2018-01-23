@@ -67,9 +67,6 @@ class FacebookSignIn(OAuthSignIn):
             decoder=decode_json
         )
         me = oauth_session.get('me').json()
-        print('**DEBUG: FacebookSignIn: Info received from facebook is {0}').format( json.dumps(me) )
-        #EXAMPLE:  {"name": "Fernando Sanchez", "id": "10154891132591945"}
-        #make-up a username - nickname, will be used for profile URLs etc
         username = me.get('name').replace(' ','') #name without spaces
         #in case facebook does not provide email
         if not me.get('email'):
@@ -119,3 +116,38 @@ class TwitterSignIn(OAuthSignIn):
             #make it up putting together the name
             me['email'] = username +'@twitter.com'
         return social_id, username, me.get('email')   # Twitter does not provide email
+
+class GoogleSignIn(OAuthSignIn):
+    """Shamelessly copied from https://github.com/heroku/heroku-airflow/blob/master/airflow_login/airflow_auth.py"""
+    def __init__(self):
+        super(GoogleSignIn, self).__init__('google')
+        self.service = OAuth2Service(
+                name='google',
+                client_id=self.consumer_id,
+                client_secret=self.consumer_secret,
+                authorize_url="https://accounts.google.com/o/oauth2/v2/auth",
+                base_url="https://www.googleapis.com/oauth2/v3/userinfo",
+                access_token_url="https://www.googleapis.com/oauth2/v4/token"
+        )
+
+    def authorize(self):   #removed "scheme" as a parameter
+        return redirect(self.service.get_authorize_url(
+            scope='email profile',
+            response_type='code',
+            redirect_uri=self.get_callback_url())   #was get_callback_url(scheme)
+            )
+
+    def callback(self):
+        if 'code' not in request.args:
+            return None, None, None
+        oauth_session = self.service.get_auth_session(
+                data={'code': request.args['code'],
+                      'grant_type': 'authorization_code',
+                      'redirect_uri': self.get_callback_url()
+                     },
+                decoder = json.loads
+        )
+        me = oauth_session.get('').json()
+        return (me['name'],
+                me['sub'],
+                me['email'])
