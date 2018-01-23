@@ -16,3 +16,4 @@ smbus-cffi	#not needed for gopigo?
 picamera
 #threading 	#already included in standard library
 #io		#standard
+rauth

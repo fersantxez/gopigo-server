@@ -1,6 +1,6 @@
 from config import Config
 from camera import Camera
-from app import app, db
+from app import app, db, login
 from app.forms import FormLogin, FormRegistration, FormForwardCms, FormBackwardCms, \
 	FormLeftTurnDegrees, FormRightTurnDegrees, FormPic, FormSettings, FormEdit
 from app.models import User, Document
@@ -11,7 +11,7 @@ from app.oauth import OAuthSignIn, FacebookSignIn, TwitterSignIn
 from flask import request, make_response, redirect, abort, render_template, url_for, \
 	flash, session, send_from_directory, Response, \
 	g
-from flask_login import login_required, current_user, login_user, logout_user, UserMixin
+from flask_login import login_required, current_user, login_user, logout_user, UserMixin, LoginManager
 from werkzeug.urls import url_parse
 
 from datetime import datetime
@@ -45,9 +45,31 @@ def before_request():
         db.session.commit()
 
 #Login Manager
-@lm.user_loader
+@login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = FormLogin()
+    if form.validate_on_submit():
+		user = User.query.filter_by(username=form.username.data).first()
+		if user is None or not user.check_password(form.password.data):
+			flash('Invalid username or password')
+			return redirect(url_for('login'))
+		login_user(user, remember=form.remember_me.data)
+		next_page = request.args.get('next')
+		if not next_page or url_parse(next_page).netloc != '':
+			next_page = url_for('index')
+		return redirect(next_page)
+    return render_template('login.html', title='Sign In', form=form)
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 #authorize with Oauth through .oauth's OAuthSignIn
 @app.route('/authorize/<provider>')
@@ -69,15 +91,10 @@ def oauth_callback(provider):
         return redirect(url_for('index'))
     user = User.query.filter_by(social_id=social_id).first()
     if not user:
-        user = User(social_id=social_id, nickname=username, email=email)
+        user = User(social_id=social_id, username=username, email=email)
         db.session.add(user)
         db.session.commit()
     login_user(user, True)
-    return redirect(url_for('index'))
-
-@app.route('/logout/')
-def logout():
-    logout_user()
     return redirect(url_for('index'))
 
 #profile pages
@@ -137,28 +154,6 @@ def send_file(filename):
 			abort(404)
 
 	return send_from_directory(Config.MEDIA_FOLDER,filename)
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = FormLogin()
-    if form.validate_on_submit():
-		user = User.query.filter_by(username=form.username.data).first()
-		if user is None or not user.check_password(form.password.data):
-			flash('Invalid username or password')
-			return redirect(url_for('login'))
-		login_user(user, remember=form.remember_me.data)
-		next_page = request.args.get('next')
-		if not next_page or url_parse(next_page).netloc != '':
-			next_page = url_for('index')
-		return redirect(next_page)
-    return render_template('login.html', title='Sign In', form=form)
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
 @login_required

@@ -22,7 +22,7 @@ class Config (object):
 		"threaded=True",
 		"host=0.0.0.0",
 		"port="+PORT,
-		"debug"=Falses
+		"debug=False"
 		]
 
 	#storage configuration
