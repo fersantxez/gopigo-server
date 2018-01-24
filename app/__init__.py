@@ -8,6 +8,7 @@ from flask_login import LoginManager
 from flask_script import Manager
 
 import os
+import sys
 import logging
 logger = logging.getLogger(Config.APP_NAME)
 
@@ -16,12 +17,12 @@ import gopigo
 #init logger
 logging.basicConfig(format=Config.LOGGING_FORMAT)
 logger = logging.getLogger(Config.APP_NAME)
-#logger.setLevel(config.LOGGING_LEVEL)
-#ch = logging.StreamHandler()
-#ch.setLevel(config.LOGGING_LEVEL)
-#formatter = logging.Formatter(Config.LOGGING_FORMAT)
-#ch.setFormatter(formatter)
-#logger.addHandler(ch)
+logger.setLevel(Config.LOGGING_LEVEL)
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(Config.LOGGING_LEVEL)
+formatter = logging.Formatter(Config.LOGGING_FORMAT)
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 logger.info('logging initialized')
 
 

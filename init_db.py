@@ -9,7 +9,8 @@ from app.util import create_document_from_file
 
 import argparse, os
 from sys import exit
-#import logging
+import logging
+logger = logging.getLogger(Config.APP_NAME)
 #from logging.handlers import RotatingFileHandler
 
 
@@ -37,7 +38,7 @@ if __name__ == "__main__":
 	username = args.get('username') or raw_input("Please enter username to initialize the App with: ")
 	password = args.get('password') or raw_input("Please enter password for user {}: ".format(username))		
 
-	print('**DEBUG: about to create a Superuser named {} with password {}'.format(username, password))
+	logger.debug('**DEBUG: about to create a Superuser named {} with password {}'.format(username, password))
 	#app.logger.info('About to create a Superuser named {} with password {}'.format(args.get('username'), args.get('password')))
 	admin_user = User( 
 		username=username,
@@ -49,7 +50,7 @@ if __name__ == "__main__":
 
 	#Look for user in db
 	if User.query.filter_by(username=admin_user.username).first():
-		print('**DEBUG: USER {} EXISTS. EXITING'.format(admin_user.username))
+		logger.error('**ERROR: USER {} EXISTS. EXITING'.format(admin_user.username))
 		#app.logger.error('User {} exists. Exiting'.format(admin_user.username))
 		exit(1)
 
@@ -61,9 +62,9 @@ if __name__ == "__main__":
 	for i in range(1,4):
 		document = create_document_from_file( Config.EMPTY_PICTURE, type="picture", user_id=admin_user.id )
 		if document:
-			print("**DEBUG: Created document {} with name {}".format(document.id, document.name))
+			logger.debug("**DEBUG: Created document {} with name {}".format(document.id, document.name))
 		else:
-			print("**ERROR creating document {}".format(i))
+			logger.error("**ERROR creating document {}".format(i))
 
 
 

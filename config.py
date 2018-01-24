@@ -1,4 +1,5 @@
 import os
+import logging
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -16,14 +17,25 @@ class Config (object):
 	DATABASE_FILE_NAME = "app.db"
 	EMPTY_PICTURE= os.path.join(MEDIA_FOLDER, 'dex-advanced.png')
 
-	PORT = "5001"
+	PORT = 5000
+	
+	DEBUG_MODE = True
+	
 	#APP RUN OPTIONS
-	APP_RUN_OPTS= [
-		"threaded=True",
-		"host=0.0.0.0",
-		"port="+PORT,
-		"debug=False"
-		]
+	APP_RUN_OPTS = {
+		'host':		'0.0.0.0',
+		'threaded':	'True',
+		'port':		PORT,
+		'debug':	DEBUG_MODE
+		}
+
+	#logging options
+	APP_NAME = 'gopigo-server'
+	LOGGING_FORMAT = '%(asctime)-15s %(message)s' #'%(asctime)-15s %(clientip)s %(user)-8s %(message)s'
+	if DEBUG_MODE:
+		LOGGING_LEVEL = logging.DEBUG 
+	else:
+		LOGGING_LEVEL = logging.INFO
 
 	#storage configuration
 	STORAGE_TYPE = "local" #local , gcs , s3
