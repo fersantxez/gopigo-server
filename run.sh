@@ -3,6 +3,7 @@
 # gopigo-server: a Flask-based REST server to control a GoPiGo Robot
 # Author: Fernando Sanchez (fer@groundcontrol.me)
 
+export PYTHON='venv/bin/python'
 export VENV_DIR=${PWD}"/venv"
 export DB_FILENAME=${PWD}/app.db
 export INIT_DB=${PWD}/init_db.py
@@ -21,8 +22,8 @@ fi
 
 #point Flask to the Main app
 export FLASK_APP=gopigo-server.py
-#export FLASK_DEBUG=1
+export FLASK_DEBUG=1
 export FLASK_DEBUG=0
 
 #run
-flask run --with-threads --host='0.0.0.0'
+${PYTHON} run.py
