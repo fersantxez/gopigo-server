@@ -2,12 +2,15 @@ from subprocess import call
 import datetime
 import os
 import io #to write JPG to file as string
+import logging
 
 from app import db
 from config import Config
 from .models import Document
 
 import picamera, camera
+
+logger = logging.getLogger(Config.APP_NAME)
 
 def get_default_iface_name_linux():
     route = "/proc/net/route"
@@ -70,7 +73,7 @@ def create_document_from_file( path, type, user_id ):
 
     except Exception as exc:
         db.session.rollback()
-        print('ERROR uploading document {}: {}'.format(path, str(exc)), 'error')
+        logger.error('ERROR uploading document {}: {}'.format(path, str(exc)), 'error')
 
 
 def take_photo():
@@ -93,7 +96,7 @@ def take_photo_from_last_frame(camera):
     frame = camera.get_frame()
     #save frame to file for temp storage and display
     file_location = os.path.join(Config.MEDIA_FOLDER, filename_from_date())
-    print('**DEBUG: writing file to {}'.format(file_location))
+    logger.debug('**DEBUG: writing file to {}'.format(file_location))
     with open (file_location, 'wb') as file:
         file.write(frame)
     file.close()

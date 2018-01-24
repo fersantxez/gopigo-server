@@ -21,6 +21,9 @@ import random #random pics
 
 import gopigo
 
+import logging
+logger = logging.getLogger(Config.APP_NAME)
+
 #Web UI
 @app.route('/')
 @app.route('/index')
@@ -92,7 +95,7 @@ def oauth_callback(provider):
 		return redirect(url_for('index'))
 	user = User.query.filter_by(email=email).first() #find the user by email in dB
 	if not user:
-		print('**DEBUG: User NOT found in the database')
+		logger.debug('**DEBUG: User NOT found in the database')
 		flash('User {} not found. Contact your administrator to get it registered'.format( email ), 'error')
 		#this code below creates the user if it's not in the dB yet
 		#user = User(social_id=social_id, username=username, email=email)
@@ -101,7 +104,7 @@ def oauth_callback(provider):
 		#login_user(user, True)
 		return redirect(url_for('login'))
 	else:
-		print('**DEBUG: User FOUND in the database as {}'.format(user))
+		logger.debug('**DEBUG: User FOUND in the database as {}'.format(user))
 		#update user
 		user.social_id=social_id
 		user.username=username
@@ -157,7 +160,7 @@ def send_file(filename):
 				file.write(document.body)
 				file.close
 			except:
-				print('**DEBUG: Error opening file for writing')
+				logger.debug('**DEBUG: Error opening file for writing')
 				flash('ERROR retrieving document {}'.format(filename), 'error')
 				raise IOError
 				abort(404)
@@ -228,7 +231,7 @@ def move():
 @app.route('/motor/forward/<int:dist>', methods=['GET'])
 @login_required
 def forward(dist):
-	print('**DEBUG: FORWARD {} cms'.format(dist))
+	logger.debug('**DEBUG: FORWARD {} cms'.format(dist))
 	flash('Moving forward {} cms'.format(dist) )
 	gopigo.fwd(dist)
 	return redirect(url_for('move'))
@@ -236,7 +239,7 @@ def forward(dist):
 @app.route('/motor/motor_forward', methods=['GET'])
 @login_required
 def motor_forward():
-	print('**DEBUG: MOTOR_FORWARD')
+	logger.debug('**DEBUG: MOTOR_FORWARD')
 	flash('Moving forward until stopped' )
 	gopigo.fwd()
 	return redirect(url_for('move'))
@@ -244,7 +247,7 @@ def motor_forward():
 @app.route('/motor/backward/<int:dist>', methods=['GET'])
 @login_required
 def backward(dist):
-	print('**DEBUG: BACKWARD {} cms'.format(dist))
+	logger.debug('**DEBUG: BACKWARD {} cms'.format(dist))
 	flash('Moving backward {} cms'.format(dist))
 	gopigo.bwd(dist)
 	return redirect(url_for('move'))
@@ -252,7 +255,7 @@ def backward(dist):
 @app.route('/motor/motor_backward', methods=['GET'])
 @login_required
 def motor_backward():
-	print('**DEBUG: BACKWARD')
+	logger.debug('**DEBUG: BACKWARD')
 	flash('Moving backward until stopped' )
 	gopigo.motor_bwd()
 	return redirect(url_for('move'))
@@ -260,7 +263,7 @@ def motor_backward():
 @app.route('/motor/left', methods=['GET'])
 @login_required
 def left():
-	print('**DEBUG: LEFT')
+	logger.debug('**DEBUG: LEFT')
 	flash('Rotating Left (slow)')
 	gopigo.left()
 	return redirect(url_for('move'))
@@ -268,7 +271,7 @@ def left():
 @app.route('/motor/left_rotation', methods=['GET'])
 @login_required
 def left_rotation():
-	print('**DEBUG: LEFT ROTATION')
+	logger.debug('**DEBUG: LEFT ROTATION')
 	flash('Rotating Left (fast)')
 	gopigo.left_rot()
 	return redirect(url_for('move'))
@@ -276,7 +279,7 @@ def left_rotation():
 @app.route('/motor/left_turn/<int:degrees>', methods=['GET'])
 @login_required
 def left_turn(degrees):
-	print('**DEBUG: TURN LEFT {} degrees'.format(degrees))
+	logger.debug('**DEBUG: TURN LEFT {} degrees'.format(degrees))
 	flash('Rotating Left {} degrees'.format(degrees))
 	gopigo.turn_left(degrees)
 	return redirect(url_for('move'))
@@ -284,7 +287,7 @@ def left_turn(degrees):
 @app.route('/motor/right', methods=['GET'])
 @login_required
 def right():
-	print('**DEBUG: RIGHT')
+	logger.debug('**DEBUG: RIGHT')
 	flash('Rotating Right (slow)')
 	gopigo.right()
 	return redirect(url_for('move'))
@@ -292,7 +295,7 @@ def right():
 @app.route('/motor/right_rotation', methods=['GET'])
 @login_required
 def right_rotation():
-	print('**DEBUG: RIGHT ROTATION')
+	logger.debug('**DEBUG: RIGHT ROTATION')
 	flash('Rotating Right (fast)')
 	gopigo.right_rot()
 	return redirect(url_for('move'))
@@ -300,7 +303,7 @@ def right_rotation():
 @app.route('/motor/right_turn/<int:degrees>', methods=['GET'])
 @login_required
 def right_turn(degrees):
-	print('**DEBUG: TURN RIGHT {} degrees'.format(degrees))
+	logger.debug('**DEBUG: TURN RIGHT {} degrees'.format(degrees))
 	flash('Rotating Right {} degrees'.format(degrees))
 	gopigo.turn_right(degrees)
 	return redirect(url_for('move'))
@@ -308,7 +311,7 @@ def right_turn(degrees):
 @app.route('/motor/stop', methods=['GET'])
 @login_required
 def stop():
-	print('**DEBUG: STOP')
+	logger.debug('**DEBUG: STOP')
 	flash('Stopped')
 	gopigo.stop()
 	return redirect(url_for('move'))
@@ -358,10 +361,9 @@ def video():
 	if db.session.query(Document).count() > 3:
 		#get two random picture names from the DB for the frame
 		rand2 = random.randrange(1, db.session.query(Document).count())
-		print('**DEBUG: rand is {}'.format(rand2))
 		document2 = Document.query.get(rand2)
 		picture2 = document2.name
-		print('**DEBUG: document {} is {}'.format(rand2, picture2))
+		logger.debug('**DEBUG: document {} is {}'.format(rand2, picture2))
 		rand3 = random.randrange(1, db.session.query(Document).count()) 
 		document3 = Document.query.get(rand3)
 		picture3 = document3.name
@@ -370,7 +372,7 @@ def video():
 		session['last_picture'] = os.path.basename(Config.EMPTY_PICTURE)
 		picture2 = session['last_picture']
 		picture3 = session['last_picture']
-		print('**DEBUG: ALL 3 pictures are {}'.format(Config.EMPTY_PICTURE))
+		logger.debug('**DEBUG: ALL 3 pictures are {}'.format(Config.EMPTY_PICTURE))
 
 	#Start streaming from the camera from the template including three thumbnails
 	return render_template('video.html', formPic=form_pic, 

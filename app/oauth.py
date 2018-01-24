@@ -3,6 +3,11 @@ import json
 from rauth import OAuth1Service, OAuth2Service
 from flask import current_app, url_for, request, redirect, session
 
+from config import Config
+
+import logging
+logger = logging.getLogger(Config.APP_NAME)
+
 class OAuthSignIn(object):
     providers = None
 
@@ -13,16 +18,16 @@ class OAuthSignIn(object):
         self.consumer_secret = credentials['secret']
 
     def authorize(self):
-        print('**DEBUG: Authorized')
+        logger.debug('**DEBUG: Authorized')
         pass
 
     def callback(self):
-        print('**DEBUG: Callback')
+        logger.debug('**DEBUG: Callback')
         pass
 
     def get_callback_url(self):
-        print('**DEBUG: Oauth: get-Callback-URL: {}').format(url_for('oauth_callback', provider=self.provider_name,
-                       _external=True))
+        logger.debug('**DEBUG: Oauth: get-Callback-URL: {}'.format(url_for('oauth_callback', provider=self.provider_name,
+                       _external=True)))
         return url_for('oauth_callback', provider=self.provider_name,
                        _external=True)
 

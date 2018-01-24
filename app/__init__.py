@@ -8,10 +8,23 @@ from flask_login import LoginManager
 from flask_script import Manager
 
 import os
+import sys
 import logging
-from logging.handlers import RotatingFileHandler
+logger = logging.getLogger(Config.APP_NAME)
 
 import gopigo
+
+#init logger
+logging.basicConfig(format=Config.LOGGING_FORMAT)
+logger = logging.getLogger(Config.APP_NAME)
+logger.setLevel(Config.LOGGING_LEVEL)
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(Config.LOGGING_LEVEL)
+formatter = logging.Formatter(Config.LOGGING_FORMAT)
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+logger.info('logging initialized')
+
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
@@ -43,4 +56,5 @@ if __name__ == '__main__':
 	handler.setLevel(logging.INFO)
 	app.logger.addHandler(handler)
 	#manager.run( ','.join(map(str, Config.APP_RUN_OPTS)))
-	manager.run(host="0.0.0.0", threaded=True)
+	#manager.run(host="0.0.0.0", threaded=True)
+	manager.run(Config.APP_RUN_OPTS)
