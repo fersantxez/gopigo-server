@@ -478,6 +478,53 @@ paths:
               $ref: "#/definitions/ApiResponse"
           404:
             description: "speed decrease operation failed"
+  
+  /gopigo/distance:
+      get:
+        tags:
+        - "gopigo"
+        summary: "Get a distance reading from the GoPiGo has an ultrasonic distance detector installed"
+        description: "Mapped to us_dist(pin), get a distance reading in CMs from the GoPiGo ultrasonic distance detector if installed. Fail otherwise."
+        operationId: "getDistance"
+        produces:
+        - "application/json"
+        parameters: []
+        responses:
+          200:
+            description: "Operation Successful"
+            schema:
+              $ref: "#/definitions/ApiResponse"
+          404:
+            description: "get Distance operation failed"
+
+  /gopigo/servo:
+    post:
+      tags:
+      - "gopigo"
+      summary: "set the GoPiGo servo position in range 0->180."
+      description: "set the GoPiGo servo position in range 0->180."
+      operationId: "setServo"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "position"
+        in: "query"
+        required: true
+        description: "Position to set in the servo. Ranges from 0->180"
+        type: "integer"
+        format: "int32"
+        minimum: 0
+        maximum: 180
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        404:
+          description: "set Speed operation failed"
+
+
+
   /gopigo/encoder:
     get:
       summary: "Placeholder"
@@ -486,23 +533,7 @@ paths:
         200:
           schema: { }
           description: "Operation Successful"
-  /gopigo/ultrasonic:
-    get:
-      summary: "Placeholder"
-      description: "Placeholder"
-      responses:
-        200:
-          schema: { }
-          description: "Operation Successful"
   /gopigo/led:
-    get:
-      summary: "Placeholder"
-      description: "Placeholder"
-      responses:
-        200:
-          schema: { }
-          description: "Operation Successful"
-  /gopigo/servo:
     get:
       summary: "Placeholder"
       description: "Placeholder"
