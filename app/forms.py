@@ -57,3 +57,10 @@ class FormSettings(FlaskForm):
 class FormEdit(FlaskForm):
     username = StringField('username', validators=[DataRequired()])
     about_me = TextAreaField('about_me', validators=[Length(min=0, max=140)])
+
+class FormServo(FlaskForm):
+    position = IntegerField('New position to look at (0-180)',[NumberRange(min=0, max=180)])
+    submit = SubmitField('Submit')
+
+class FormDistance(FlaskForm):
+    get_distance = SubmitField('Get Distance')

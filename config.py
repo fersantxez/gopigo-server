@@ -69,6 +69,7 @@ class Config (object):
 	    },
 	}
 
+	PIN_NUMBER_SERVO = 15 #this is port A1 according to https://github.com/DexterInd/GoPiGo/blob/master/Software/Python/Examples/Ultrasonic_Servo/us_servo_scan.py
 
 	#audio configuration
 
