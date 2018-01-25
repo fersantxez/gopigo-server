@@ -2,15 +2,14 @@ from config import Config
 from camera import Camera
 from app import app, db, login
 from app.forms import FormLogin, FormRegistration, FormForwardCms, FormBackwardCms, \
-	FormLeftTurnDegrees, FormRightTurnDegrees, FormPic, FormSettings, FormEdit
+	FormLeftTurnDegrees, FormRightTurnDegrees, FormPic, FormSettings, FormEdit, FormServo
 from app.models import User, Document
 import app.util as util
 #OAuth Abstraction layer
 from app.oauth import OAuthSignIn, FacebookSignIn, TwitterSignIn
 
 from flask import request, make_response, redirect, abort, render_template, url_for, \
-	flash, session, send_from_directory, Response, \
-	g
+	flash, session, send_from_directory, Response, g
 from flask_login import login_required, current_user, login_user, logout_user, UserMixin, LoginManager
 from werkzeug.urls import url_parse
 
@@ -407,6 +406,26 @@ def settings():
 		pass
 
 	return render_template('settings.html', title='Settings', form=form)
+
+#Servo and distance detection
+@app.route('/servo', methods=['GET', 'POST'])
+@login_required
+def servo():
+	"""Display the Servo page"""
+	form = FormServo()
+	if form.validate_on_submit():
+		flash('Head position changed. Now "looking" towards {}'.format(form.position))
+	return render_template('servo.html', form=form)
+
+@app.route('/distance', methods=['GET', 'POST'])
+@login_required
+def distance():
+	"""Display the Distance page"""
+	form = FormDistance()
+	if form.validate_on_submit():
+		distance = gopigo.us_dist(Config.PIN_NUMBER_SERVO)
+		flash('I can see an object at {} cms from me'.format(distance))
+	return render_template('distance.html', form=form)
 
 #Error handlers
 @app.errorhandler(404)
