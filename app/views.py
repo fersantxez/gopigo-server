@@ -2,7 +2,7 @@ from config import Config
 from camera import Camera
 from app import app, db, login
 from app.forms import FormLogin, FormRegistration, FormForwardCms, FormBackwardCms, \
-	FormLeftTurnDegrees, FormRightTurnDegrees, FormPic, FormSettings, FormEdit, FormServo
+	FormLeftTurnDegrees, FormRightTurnDegrees, FormPic, FormSettings, FormEdit, FormServo, FormDistance
 from app.models import User, Document
 import app.util as util
 #OAuth Abstraction layer
@@ -59,7 +59,8 @@ def login():
 	if form.validate_on_submit():
 		user = User.query.filter_by(username=form.username.data).first()
 		if user is None or not user.check_password(form.password.data):
-			flash('Invalid username or password')
+			logger.error('Invalid username or password')
+			flash('Invalid username or password','error')
 			return redirect(url_for('login'))
 		login_user(user, remember=form.remember_me.data)
 		next_page = request.args.get('next')
@@ -90,7 +91,8 @@ def oauth_callback(provider):
 	oauth = OAuthSignIn.get_provider(provider)
 	social_id, username, email = oauth.callback()
 	if social_id is None:
-		flash('Authentication failed.')
+		logger.error('Authentication failed.')
+		flash('Authentication failed.','error')
 		return redirect(url_for('index'))
 	user = User.query.filter_by(email=email).first() #find the user by email in dB
 	if not user:
@@ -117,7 +119,7 @@ def oauth_callback(provider):
 def user(username):
 	user = User.query.filter_by(username=username).first()
 	if user == None:
-		flash('User %s not found.' % username)
+		flash('User %s not found.' % username,'error')
 		return redirect(url_for('index'))
 	documents = [
 		##TODO: generate a few documents for the profile page
@@ -136,7 +138,7 @@ def edit():
 		g.user.about_me = form.about_me.data
 		db.session.add(g.user)
 		db.session.commit()
-		flash('Your changes have been saved.')
+		flash('Your changes have been saved.','message')
 		return redirect(url_for('edit'))
 	else:
 		form.username.data = g.user.username
@@ -179,7 +181,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Added user {} with email {}!'.format(user.username, user.email))
+        flash('Added user {} with email {}!'.format(user.username, user.email),'message')
         return redirect(url_for('index'))
     return render_template('register.html', title='Add User', form=form)
 
@@ -198,28 +200,28 @@ def move():
 	if form_fwd.validate_on_submit():
 		dist = form_fwd.forward_distance.data #Integer
 		if dist > 0:
-			flash('About to MOVE forward {} cms'.format(dist))
+			flash('About to MOVE forward {} cms'.format(dist),'message')
 			return redirect(url_for('forward', dist=dist))
 		return redirect(url_for('move'))
 
 	if form_bwd.validate_on_submit():
 		dist = form_bwd.backward_distance.data
 		if dist > 0:
-			flash('About to MOVE backward {} cms'.format(dist))
+			flash('About to MOVE backward {} cms'.format(dist),'message')
 			return redirect(url_for('backward', dist=dist))
 		return redirect(url_for('move'))
 
 	if form_lt.validate_on_submit():
 		degrees = form_lt.lturn_degrees.data
 		if degrees > 0:
-			flash('About to TURN left {} degrees'.format(degrees))
+			flash('About to TURN left {} degrees'.format(degrees),'message')
 			return redirect(url_for('left_turn', degrees=degrees))
 		return redirect(url_for('move'))
 
 	if form_rt.validate_on_submit():
 		degrees = form_rt.rturn_degrees.data
 		if degrees > 0:
-			flash('About to TURN right {} degrees'.format(degrees))
+			flash('About to TURN right {} degrees'.format(degrees),'message')
 			return redirect(url_for('right_turn', degrees=degrees))
 		return redirect(url_for('move'))
 
@@ -231,7 +233,7 @@ def move():
 @login_required
 def forward(dist):
 	logger.debug('**DEBUG: FORWARD {} cms'.format(dist))
-	flash('Moving forward {} cms'.format(dist) )
+	flash('Moving forward {} cms'.format(dist),'message')
 	gopigo.fwd(dist)
 	return redirect(url_for('move'))
 
@@ -239,7 +241,7 @@ def forward(dist):
 @login_required
 def motor_forward():
 	logger.debug('**DEBUG: MOTOR_FORWARD')
-	flash('Moving forward until stopped' )
+	flash('Moving forward until stopped','message' )
 	gopigo.fwd()
 	return redirect(url_for('move'))
 
@@ -247,7 +249,7 @@ def motor_forward():
 @login_required
 def backward(dist):
 	logger.debug('**DEBUG: BACKWARD {} cms'.format(dist))
-	flash('Moving backward {} cms'.format(dist))
+	flash('Moving backward {} cms'.format(dist),'message')
 	gopigo.bwd(dist)
 	return redirect(url_for('move'))
 
@@ -255,7 +257,7 @@ def backward(dist):
 @login_required
 def motor_backward():
 	logger.debug('**DEBUG: BACKWARD')
-	flash('Moving backward until stopped' )
+	flash('Moving backward until stopped','message')
 	gopigo.motor_bwd()
 	return redirect(url_for('move'))
 	
@@ -271,14 +273,14 @@ def left():
 @login_required
 def left_rotation():
 	logger.debug('**DEBUG: LEFT ROTATION')
-	flash('Rotating Left (fast)')
+	flash('Rotating Left (fast)','message')
 	gopigo.left_rot()
 	return redirect(url_for('move'))
 
 @app.route('/motor/left_turn/<int:degrees>', methods=['GET'])
 @login_required
 def left_turn(degrees):
-	logger.debug('**DEBUG: TURN LEFT {} degrees'.format(degrees))
+	logger.debug('**DEBUG: TURN LEFT {} degrees'.format(degrees),'message')
 	flash('Rotating Left {} degrees'.format(degrees))
 	gopigo.turn_left(degrees)
 	return redirect(url_for('move'))
@@ -287,7 +289,7 @@ def left_turn(degrees):
 @login_required
 def right():
 	logger.debug('**DEBUG: RIGHT')
-	flash('Rotating Right (slow)')
+	flash('Rotating Right (slow)','message')
 	gopigo.right()
 	return redirect(url_for('move'))
 	
@@ -295,7 +297,7 @@ def right():
 @login_required
 def right_rotation():
 	logger.debug('**DEBUG: RIGHT ROTATION')
-	flash('Rotating Right (fast)')
+	flash('Rotating Right (fast)','message')
 	gopigo.right_rot()
 	return redirect(url_for('move'))
 
@@ -303,7 +305,7 @@ def right_rotation():
 @login_required
 def right_turn(degrees):
 	logger.debug('**DEBUG: TURN RIGHT {} degrees'.format(degrees))
-	flash('Rotating Right {} degrees'.format(degrees))
+	flash('Rotating Right {} degrees'.format(degrees),'message')
 	gopigo.turn_right(degrees)
 	return redirect(url_for('move'))
 	
@@ -311,7 +313,7 @@ def right_turn(degrees):
 @login_required
 def stop():
 	logger.debug('**DEBUG: STOP')
-	flash('Stopped')
+	flash('Stopped','message')
 	gopigo.stop()
 	return redirect(url_for('move'))
 
@@ -338,7 +340,7 @@ def video():
 		pic_location = util.take_photo_from_last_frame(Camera())
 		#Create the document in the database from the file
 		document = util.create_document_from_file(pic_location, "picture", current_user.id )
-		flash( "Picture taken and stored! {}".format(document.name))
+		flash( "Picture taken and stored! {}".format(document.name), 'message')
 
 		#delete previous "last picture" file from disk (its stored in DB)
 		#try:
@@ -402,7 +404,7 @@ def settings():
 		Config.CAMERA_RES = new_resolution
 		Config.CAMERA_SHARPNESS = form.camera_sharpness.data
 		flash('Settings updated. New res: {} New sharp: {}'.format(\
-			Config.CAMERA_RES, Config.CAMERA_SHARPNESS, 'info'))
+			Config.CAMERA_RES, Config.CAMERA_SHARPNESS, 'message'))
 		pass
 
 	return render_template('settings.html', title='Settings', form=form)
@@ -414,7 +416,11 @@ def servo():
 	"""Display the Servo page"""
 	form = FormServo()
 	if form.validate_on_submit():
-		flash('Head position changed. Now "looking" towards {}'.format(form.position))
+		position = form.position.data
+		logger.debug('form.position is {}'.format(position))
+		gopigo.servo(position)
+		logger.info('Head position changed. Now "looking" towards {}'.format(position))
+		flash('Head position changed. Now "looking" towards {}'.format(position), 'message')
 	return render_template('servo.html', form=form)
 
 @app.route('/distance', methods=['GET', 'POST'])
@@ -424,7 +430,8 @@ def distance():
 	form = FormDistance()
 	if form.validate_on_submit():
 		distance = gopigo.us_dist(Config.PIN_NUMBER_SERVO)
-		flash('I can see an object at {} cms from me'.format(distance))
+		logger.debug('I can see an object at {} cms from me'.format(distance))
+		flash('I can see an object at {} cms from me'.format(distance), 'message')
 	return render_template('distance.html', form=form)
 
 #Error handlers

@@ -1,18 +1,15 @@
 {% extends "base.html" %}
 
-{% import "bootstrap/wtf.html" as wtf %}
-
 {% block page_content %}
 <h1>Distance</h1>
 
 <div class="btn-group btn-group-justified">
-  <form action="" method="POST">
-    {{ form.hidden_tag() }}
-    <p>
-      {{ form.get_distance.label }}<br>
-      {{ form.get_distance_submit }}            
-    </p>
-  </form>
+   <div class="media-right">
+		<form action="" method="POST">
+			{{ form.hidden_tag() }}
+			<p>{{ form.get_distance }}</p>
+		</form>
+   </div>
 
 {% endblock %}
 
