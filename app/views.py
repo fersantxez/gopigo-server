@@ -421,6 +421,7 @@ def servo():
 		gopigo.servo(position)
 		logger.info('Head position changed. Now "looking" towards {}'.format(position))
 		flash('Head position changed. Now "looking" towards {}'.format(position), 'message')
+		gopigo.disable_servo() #avoid jittering
 	return render_template('servo.html', form=form)
 
 @app.route('/distance', methods=['GET', 'POST'])
