@@ -42,8 +42,8 @@ def index():
 def before_request():
 	g.user = current_user
 	if g.user.is_authenticated:
-		g.user.last_seen = datetime.utcnow() #update "last seen"
-		db.session.add(g.user)
+		g.user.last_seen = datetime.utcnow()	#update "last seen"
+		db.session.add(g.user) 					#add user to DB. FIXME: are we adding empty users?
 		db.session.commit()
 
 #Login Manager
@@ -435,12 +435,26 @@ def distance():
 		flash('I can see an object at {} cms from me'.format(distance), 'message')
 	return render_template('distance.html', form=form)
 
-#Error handlers
+#Error handlers - only for 404 and 500, others are API specific
 @app.errorhandler(404)
 def page_not_found(e):
+	#content negotiation for API clients
+	if request.accept_mimetypes.accept_json and \
+			not request.accept_mimetypes.accept_html:
+		response = jsonify({'error': 'not found'}) 
+		response.status_code = 404
+		return response
 	return render_template('404.html'), 404
 
-@app.errorhandler(500)
-def internal_server_error(e):
+@app.errorhandler(500) 
+def forbidden(message):
+	if request.accept_mimetypes.accept_json and \
+			not request.accept_mimetypes.accept_html:
+		response = jsonify({'error': 'internal server error. ouch!', 'message': message}) 
+		response.status_code = 500
+		return response
 	return render_template('500.html'), 500
+
+
+
 

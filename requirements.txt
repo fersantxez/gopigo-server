@@ -8,6 +8,8 @@ flask-sqlalchemy
 flask-migrate
 flask-whooshalchemy
 
+flask-httpauth
+
 #sqlalchemy_imageattach
 
 #gopigo		#directly copying the modified version in /app
@@ -17,3 +19,5 @@ picamera
 #threading 	#already included in standard library
 #io		#standard
 rauth
+
+

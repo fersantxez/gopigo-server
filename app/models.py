@@ -1,6 +1,9 @@
 from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from config import Config
+
+#FIXME from ??? import Serializer
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -51,6 +54,21 @@ class User(UserMixin, db.Model):
             return unicode(self.id)  # python 2
         except NameError:
             return str(self.id)  # python 3
+
+    #Token for HTTP Auth (API calls)
+    def generate_auth_token(self, expiration):
+        s = Serializer(current_app.config['SECRET_KEY'],
+                    expires_in=Config.TOKEN_EXPIRATION) 
+        return s.dumps({'id': self.id})
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(current_app.config['SECRET_KEY']) 
+        try:
+            data = s.loads(token) 
+        except:
+            return None
+        return User.query.get(data['id'])
 
     def __repr__(self):
         return '<User {}><email {}><password_hash {}>'.format(self.username,self.email,self.password_hash)
