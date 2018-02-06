@@ -49,7 +49,7 @@ def filename_from_date():
     return date_string    
 
 def create_document_from_file( path, type, user_id ):
-    """creates an object with all the metadata from a file.
+    """create an object with all the metadata from a file.
     Uploads it to the database as a full object"""
 
     try:
@@ -96,11 +96,11 @@ def take_photo_from_last_frame(camera):
     frame = camera.get_frame()
     #save frame to file for temp storage and display
     file_location = os.path.join(Config.MEDIA_FOLDER, filename_from_date())
-    logger.debug('**DEBUG: writing file to {}'.format(file_location))
+    logger.debug('Writing file to {}'.format(file_location))
     with open (file_location, 'wb') as file:
         file.write(frame)
     file.close()
-    print('**DEBUG: written {}'.format(file_location))
+    logger.debug('Written file {}'.format(file_location))
 
     return file_location
 
