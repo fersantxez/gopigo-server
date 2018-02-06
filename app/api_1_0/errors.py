@@ -1,11 +1,39 @@
-from flask import response
-import jsonify
+from flask import jsonify
+from . import api
+from app.exceptions import ValidationError
 
-#Error handlers - these overwrite the "main" ones?
-#404 and 500 remain in main, here are the remaining ones
+from config import Config
+import logging
+logger = logging.getLogger(Config.APP_NAME)
 
-@app.errorhandler(403) 
+#Error handlers - start with the @api so they dont overwrite the "main" ones?
+#@api.errorhandler(403) 
+#def forbidden(message):
+#	response = jsonify({'error': 'forbidden', 'message': message}) 
+#	response.status_code = 403
+#	return response
+
+#redirect all errors to a bad_request with the function name above as argument
+@api.errorhandler(ValidationError)
+def validation_error(e):
+	return bad_request(e.args[0])
+
+def bad_request(message):
+	logger.error('API access: {}'.format(message))
+	response = jsonify({'error': 'bad request', 'message': message})
+	response.status_code = 400
+	return response
+
+
+def unauthorized(message):
+	logger.error('API access: {}'.format(message))
+	response = jsonify({'error': 'unauthorized', 'message': message})
+	response.status_code = 401
+	return response
+
+
 def forbidden(message):
-	response = jsonify({'error': 'forbidden', 'message': message}) 
+	logger.error('API access: {}'.format(message))
+	response = jsonify({'error': 'forbidden', 'message': message})
 	response.status_code = 403
 	return response

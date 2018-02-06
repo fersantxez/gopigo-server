@@ -200,28 +200,24 @@ def move():
 	if form_fwd.validate_on_submit():
 		dist = form_fwd.forward_distance.data #Integer
 		if dist > 0:
-			flash('About to MOVE forward {} cms'.format(dist),'message')
 			return redirect(url_for('forward', dist=dist))
 		return redirect(url_for('move'))
 
 	if form_bwd.validate_on_submit():
 		dist = form_bwd.backward_distance.data
 		if dist > 0:
-			flash('About to MOVE backward {} cms'.format(dist),'message')
 			return redirect(url_for('backward', dist=dist))
 		return redirect(url_for('move'))
 
 	if form_lt.validate_on_submit():
 		degrees = form_lt.lturn_degrees.data
 		if degrees > 0:
-			flash('About to TURN left {} degrees'.format(degrees),'message')
 			return redirect(url_for('left_turn', degrees=degrees))
 		return redirect(url_for('move'))
 
 	if form_rt.validate_on_submit():
 		degrees = form_rt.rturn_degrees.data
 		if degrees > 0:
-			flash('About to TURN right {} degrees'.format(degrees),'message')
 			return redirect(url_for('right_turn', degrees=degrees))
 		return redirect(url_for('move'))
 

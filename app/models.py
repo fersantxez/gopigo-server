@@ -1,9 +1,12 @@
-from app import db, login
+#from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
-from config import Config
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
-#FIXME from ??? import Serializer
+from flask_login import UserMixin
+from app.exceptions import ValidationError
+from config import Config
+from . import db, login
+
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
