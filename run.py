@@ -1,5 +1,9 @@
 #!venv/bin/python
 from config import Config
 from app import app
-print("**DEBUG: RUNNING THE APP WITH OPTIONS: {}".format(Config.APP_RUN_OPTS))
+
+import logging
+logger = logging.getLogger(Config.APP_NAME)
+
+logger.debug("RUNNING THE APP WITH OPTIONS: {}".format(Config.APP_RUN_OPTS))
 app.run(**Config.APP_RUN_OPTS)
