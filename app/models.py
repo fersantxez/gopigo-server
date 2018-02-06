@@ -1,6 +1,12 @@
-from app import db, login
+#from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+
 from flask_login import UserMixin
+from app.exceptions import ValidationError
+from config import Config
+from . import db, login
+
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -52,6 +58,21 @@ class User(UserMixin, db.Model):
         except NameError:
             return str(self.id)  # python 3
 
+    #Token for HTTP Auth (API calls)
+    def generate_auth_token(self, expiration):
+        s = Serializer(current_app.config['SECRET_KEY'],
+                    expires_in=Config.TOKEN_EXPIRATION) 
+        return s.dumps({'id': self.id})
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(current_app.config['SECRET_KEY']) 
+        try:
+            data = s.loads(token) 
+        except:
+            return None
+        return User.query.get(data['id'])
+
     def __repr__(self):
         return '<User {}><email {}><password_hash {}>'.format(self.username,self.email,self.password_hash)
 
@@ -70,6 +91,20 @@ class Document(db.Model):
 
     def __repr__(self):
         return '<Name {}><Type {}><Size {}>'.format(self.name, self.type, self.size)
+
+    def to_json(self): 
+        json_document = {
+            'name': self.name,
+            'type': self.type,
+            'extension': self.extension,
+            'size': self.size,
+            'user_id': self.user_id,
+            'location': self.location,
+            'body': url_for(self.name,            #offer the body through the internal path
+                                _external=True)
+
+        }
+        return json_post
 
 @login.user_loader
 def load_user(id):

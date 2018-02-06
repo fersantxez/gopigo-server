@@ -1,11 +1,12 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
-from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_script import Manager
+
+from config import Config
 
 import os
 import sys
@@ -13,6 +14,7 @@ import logging
 logger = logging.getLogger(Config.APP_NAME)
 
 import gopigo
+
 
 #init logger
 logging.basicConfig(format=Config.LOGGING_FORMAT)
@@ -25,31 +27,39 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 logger.info('logging initialized')
 
-
+#create app
+#init handlers and flask app
 app = Flask(__name__)
+app.config.from_object(Config)
 bootstrap = Bootstrap(app)
 moment = Moment(app)
+#init login
 login = LoginManager(app)
 login.login_view = 'login'
+#init app manager/launcher
 manager = Manager(app)
+#init DB
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
-app.config.from_object(Config)
-
-#init Gopigo
+#init HW / Gopigo
 import atexit
 atexit.register(gopigo.stop)
 
-#Initialize Base directory
+#init Base directory
 if not os.path.exists(Config.BASE_DIR):
     os.makedirs(Config.BASE_DIR)
+
 #initialize Video and Audio directory
 if not os.path.exists(Config.MEDIA_FOLDER):
     os.makedirs(Config.MEDIA_FOLDER)
 
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-
+#initialize app -- TODO: add app blueprint
 from app import views, models
+
+#import API blueprint after initializing the app
+from .api_1_0 import api as api_1_0_blueprint
+app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0') 
 
 if __name__ == '__main__':
 	handler = RotatingFileHandler('foo.log', maxBytes=10000, backupCount=1)

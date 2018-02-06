@@ -73,6 +73,9 @@ class Config (object):
 
 	#audio configuration
 
+	#HTTP Authentication configuration
+	TOKEN_EXPIRATION = 3600 #seconds
+
 
 
 

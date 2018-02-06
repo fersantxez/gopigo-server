@@ -8,12 +8,13 @@ flask-sqlalchemy
 flask-migrate
 flask-whooshalchemy
 
-#sqlalchemy_imageattach
+itsdangerous
 
-#gopigo		#directly copying the modified version in /app
+flask-httpauth
+
 rpi.gpio
 smbus-cffi	#not needed for gopigo?
 picamera
-#threading 	#already included in standard library
-#io		#standard
 rauth
+
+
