@@ -89,6 +89,20 @@ class Document(db.Model):
     def __repr__(self):
         return '<Name {}><Type {}><Size {}>'.format(self.name, self.type, self.size)
 
+    def to_json(self): 
+        json_document = {
+            'name': self.name,
+            'type': self.type,
+            'extension': self.extension,
+            'size': self.size,
+            'user_id': self.user_id,
+            'location': self.location,
+            'body': url_for(self.name,            #offer the body through the internal path
+                                _external=True)
+
+        }
+        return json_post
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
