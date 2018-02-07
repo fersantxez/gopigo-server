@@ -17,4 +17,5 @@ smbus-cffi	#not needed for gopigo?
 picamera
 rauth
 
+google-cloud
 

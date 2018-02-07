@@ -2,11 +2,13 @@ from config import Config
 from camera import Camera
 from app import app, db, login
 from app.forms import FormLogin, FormRegistration, FormForwardCms, FormBackwardCms, \
-	FormLeftTurnDegrees, FormRightTurnDegrees, FormPic, FormSettings, FormEdit, FormServo, FormDistance
+	FormLeftTurnDegrees, FormRightTurnDegrees, FormPic, FormSettings, FormEdit, FormServo, FormDistance, \
+	FormListBuckets
 from app.models import User, Document
 import app.util as util
 #OAuth Abstraction layer
 from app.oauth import OAuthSignIn, FacebookSignIn, TwitterSignIn
+import app.gcp as gcp
 
 from flask import request, make_response, redirect, abort, render_template, url_for, \
 	flash, session, send_from_directory, Response, g
@@ -430,6 +432,18 @@ def distance():
 		logger.debug('I can see an object at {} cms from me'.format(distance))
 		flash('I can see an object at {} cms from me'.format(distance), 'message')
 	return render_template('distance.html', form=form)
+
+#GCP
+@app.route('/gcp', methods=['GET', 'POST'])
+@login_required
+def gcp_page():
+	"""Display the GCP test page"""
+	formListBuckets = FormListBuckets()
+	if formListBuckets.validate_on_submit():
+		buckets = gcp.list_buckets()
+		for i, bucket in enumerate(buckets):
+			flash('Found bucket number {}: {}'.format(i, bucket), 'message')
+	return render_template('gcp.html', formListBuckets=formListBuckets)
 
 #Error handlers - only for 404 and 500, others are API specific
 @app.errorhandler(404)
