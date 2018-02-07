@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<h1>GCP test</h1>
+
+<div class="btn-group btn-group-justified">
+   <div class="media-right">
+		<form action="" method="POST">
+			{{ formListBuckets.hidden_tag() }}
+			<p>{{ formListBuckets.get_buckets }}</p>
+		</form>
+   </div>
+
+{% endblock %}
+
+
+

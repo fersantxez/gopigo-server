@@ -77,6 +77,8 @@ class Config (object):
 	TOKEN_EXPIRATION = 3600 #seconds
 
 
+	#GCP app dafault credentials location
+	GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION="/home/pi/.ssh/gcp-application-default-credentials.json"
 
 
 	

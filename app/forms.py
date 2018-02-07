@@ -64,3 +64,6 @@ class FormServo(FlaskForm):
 
 class FormDistance(FlaskForm):
     get_distance = SubmitField('Get Distance')
+
+class FormListBuckets(FlaskForm):
+    get_buckets = SubmitField('Get Available GCS buckets')
