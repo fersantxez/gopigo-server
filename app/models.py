@@ -87,7 +87,7 @@ class Document(db.Model):
     size = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     location = db.Column(db.String(512), index = True)
-    body = db.Column(db.LargeBinary)
+    body = db.Column(db.LargeBinary, nullable=True)
 
     def __repr__(self):
         return '<Name {}><Type {}><Size {}>'.format(self.name, self.type, self.size)
@@ -102,7 +102,6 @@ class Document(db.Model):
             'location': self.location,
             'body': url_for(self.name,            #offer the body through the internal path
                                 _external=True)
-
         }
         return json_post
 

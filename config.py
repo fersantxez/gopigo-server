@@ -3,6 +3,7 @@ import logging
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+
 class Config (object):
 	WTF_CSRF_ENABLED = True
 	SECRET_KEY = 'you-will-never-guess'
@@ -13,9 +14,9 @@ class Config (object):
 	#Working directories
 	BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 	MEDIA_FOLDER = os.path.join(BASE_DIR, 'app', 'static', 'media')	#for static content
+	EMPTY_PICTURE= os.path.join(MEDIA_FOLDER, 'dex-advanced.png')
 
 	DATABASE_FILE_NAME = "app.db"
-	EMPTY_PICTURE= os.path.join(MEDIA_FOLDER, 'dex-advanced.png')
 
 	PORT = 5000
 	
@@ -31,6 +32,7 @@ class Config (object):
 
 	#logging options
 	APP_NAME = 'gopigo-server'
+	logger = logging.getLogger(APP_NAME)
 	LOGGING_FORMAT = '%(asctime)-15s %(message)s' #'%(asctime)-15s %(clientip)s %(user)-8s %(message)s'
 	if DEBUG_MODE:
 		LOGGING_LEVEL = logging.DEBUG 
@@ -53,7 +55,7 @@ class Config (object):
 	    ("5", "HD")
 	    ]
 
-	#TODO: read these from a safe location
+	#TODO: read these from an environment variable
 	OAUTH_CREDENTIALS = {
 	    'facebook': {
 	        'id': '174382259821684',
@@ -76,9 +78,13 @@ class Config (object):
 	#HTTP Authentication configuration
 	TOKEN_EXPIRATION = 3600 #seconds
 
+	#GCP app dafault credentials location - Read from environment variable or hardcode by default
+	GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION=os.environ.get(
+		'GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION',
+		"/home/pi/.ssh/gcp-application-default-credentials.json" )		#default value if var not defined
+	logger.debug('GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION: {}'.format(GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION))
 
-	#GCP app dafault credentials location
-	GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION="/home/pi/.ssh/gcp-application-default-credentials.json"
+	bucket_name = "" #to be set on app init
 
 
 	

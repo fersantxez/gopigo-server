@@ -150,20 +150,25 @@ def edit():
 #serve static files
 @app.route('/<path:filename>')
 def send_file(filename):
-#if it doesn't exist on MEDIA, search in DB and send_or_404
+	logger.debug('REQUESTED DOCUMENT: {}'.format(filename))
+	#if it doesn't exist on MEDIA, search in GCS and send_or_404
 	file_location = os.path.join(Config.MEDIA_FOLDER,filename)
 	if not os.path.exists(file_location):
 	#find "filename" in the Database
 		document = Document.query.filter_by(name=filename).first()
 		#find in database and write body to STATIC directory
 		if document:
-			#if file doesnt exist, get it from DB (picture just taken not deleted yet)
+			#if file doesnt exist, get it from GCS
+			logger.debug('FOUND DOCUMENT: {}'.format(document))
 			try:
+				logger.debug('opening file_location: {}'.format(file_location))
 				file = open(file_location, 'wb')
-				file.write(document.body)
-				file.close
-			except:
-				logger.debug('**DEBUG: Error opening file for writing')
+				gcp.read_file_from_bucket( filename, file )
+				logger.debug('there should be a file now in: {}'.format(file_location))
+				#file.write(document.body)
+				file.close()
+			except Exception as exc:
+				logger.debug('**DEBUG: Error opening file for writing {}: {}'.format(file_location, str(exc)))
 				flash('ERROR retrieving document {}'.format(filename), 'error')
 				raise IOError
 				abort(404)
@@ -325,13 +330,12 @@ def video():
 	'''
 
 	form_pic = FormPic()
-	picture2 = None
-	picture3 = None
+	
+	session['last_picture'] = os.path.basename(Config.EMPTY_PICTURE)
 
 
 	if form_pic.validate_on_submit():
 		#stop streaming from the camera to make it available for pictures
-
 		#take a picture and save it to disk
 		#return full dictionary with pic and metadata according to Model
 		#document = util.take_photo() #this is for camera only without streaming
@@ -339,45 +343,31 @@ def video():
 		#Create the document in the database from the file
 		document = util.create_document_from_file(pic_location, "picture", current_user.id )
 		flash( "Picture taken and stored! {}".format(document.name), 'message')
-
-		#delete previous "last picture" file from disk (its stored in DB)
-		#try:
-		#	last_pic_location = os.path.join(Config.MEDIA_FOLDER, session.get('last_picture'))
-		#	if last_pic_location:
-		#		os.remove(last_pic_location)
-		#except:
-		#	print('**ERROR: Unable to delete last picture')
-		#picture just taken is now the last picture
-		last_pic_file=document.name
 		session['last_picture'] = document.name
 		return redirect(url_for('video', formPic=form_pic, last_picture=document.name))
+
+		#picture just taken is now the last picture
+	picture_names=[]
+	for i, blob in enumerate(gcp.blobs_in_bucket()):
+		filename = blob.name
+		picture_names.append( filename )
+		logger.debug( 'appended number {}: {}'.format(i, filename))
+		if i>3:
+			break
+	#if there are not enough pics in bucket, fill with EMPTY_PICTURE
+	while len(picture_names) < 3:
+		picture_names.append( os.path.basename(Config.EMPTY_PICTURE) )
+		logger.debug('appending an empty picture')
 
 	#TODO:check whether the camera is present and the streaming SW is ready
 		#otherwise show processing message and install it if possible
 		#if success continue, otherwise redirect to index
 
-	#see if there are pictures to display in the database
-	if db.session.query(Document).count() > 3:
-		#get two random picture names from the DB for the frame
-		rand2 = random.randrange(1, db.session.query(Document).count())
-		document2 = Document.query.get(rand2)
-		picture2 = document2.name
-		logger.debug('**DEBUG: document {} is {}'.format(rand2, picture2))
-		rand3 = random.randrange(1, db.session.query(Document).count()) 
-		document3 = Document.query.get(rand3)
-		picture3 = document3.name
-
-	else:
-		session['last_picture'] = os.path.basename(Config.EMPTY_PICTURE)
-		picture2 = session['last_picture']
-		picture3 = session['last_picture']
-		logger.debug('**DEBUG: ALL 3 pictures are {}'.format(Config.EMPTY_PICTURE))
-
 	#Start streaming from the camera from the template including three thumbnails
 	return render_template('video.html', formPic=form_pic, 
-		last_picture=session.get('last_picture'),
-		picture2=picture2,
-		picture3=picture3)
+		last_picture=session.get('last_picture'),	#picture_names[0]
+		picture2=picture_names[0],		#picture2,
+		picture3=picture_names[1])		#picture3)
 
 
 @app.route('/video_feed')
