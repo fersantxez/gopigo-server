@@ -81,10 +81,12 @@ import gcp
 #	logger.info('GCS bucket {} does not exist, creating it'.format(bucket_name))
 #	bucket = gcp.create_bucket(bucket_name)
 try:
-	bucket = gcp.create_bucket(bucket_name)
-	logger.info('GCS bucket {} does not exist, creating it'.format(bucket_name))
-except: #google.cloud.exceptions.Conflict:
+	bucket = gcp.get_bucket(bucket_name)
 	logger.info('GCS bucket {} already exists, using it'.format(bucket_name))
+except Exception as exc: #google.cloud.exceptions.Conflict: #means the bucket does not exist
+	logger.error('Exception getting bucket: {}'.format(exc))
+	logger.info('GCS bucket {} does not exist, creating it'.format(bucket_name))
+	bucket = gcp.create_bucket(bucket_name)
 Config.bucket_name = bucket.name
 logger.debug('Stored bucket {}'.format(Config.bucket_name))
 

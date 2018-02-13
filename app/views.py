@@ -98,16 +98,16 @@ def oauth_callback(provider):
 		return redirect(url_for('index'))
 	user = User.query.filter_by(email=email).first() #find the user by email in dB
 	if not user:
-		logger.debug('**DEBUG: User NOT found in the database')
+		logger.debug('User NOT found in the database')
 		flash('User {} not found. Contact your administrator to get it registered'.format( email ), 'error')
-		#this code below creates the user if it's not in the dB yet
+		#this below creates the user if it's not in the dB yet
 		#user = User(social_id=social_id, username=username, email=email)
 		#db.session.add(user)
 		#db.session.commit()
 		#login_user(user, True)
 		return redirect(url_for('login'))
 	else:
-		logger.debug('**DEBUG: User FOUND in the database as {}'.format(user))
+		logger.debug('User FOUND in the database as {}'.format(user))
 		#update user
 		user.social_id=social_id
 		user.username=username
@@ -150,6 +150,7 @@ def edit():
 #serve static files
 @app.route('/<path:filename>')
 def send_file(filename):
+	"""Serve a file by the name. Searches for the location in the dB, downloads it to disk and returns it"""
 	logger.debug('REQUESTED DOCUMENT: {}'.format(filename))
 	#if it doesn't exist on MEDIA, search in GCS and send_or_404
 	file_location = os.path.join(Config.MEDIA_FOLDER,filename)
@@ -159,16 +160,16 @@ def send_file(filename):
 		#find in database and write body to STATIC directory
 		if document:
 			#if file doesnt exist, get it from GCS
-			logger.debug('FOUND DOCUMENT: {}'.format(document))
+			logger.debug('FOUND DOCUMENT in DB: {}'.format(document))
 			try:
-				logger.debug('opening file_location: {}'.format(file_location))
+				logger.debug('opening file_location for DOCUMENT: {}'.format(file_location))
 				file = open(file_location, 'wb')
 				gcp.read_file_from_bucket( filename, file )
 				logger.debug('there should be a file now in: {}'.format(file_location))
 				#file.write(document.body)
 				file.close()
 			except Exception as exc:
-				logger.debug('**DEBUG: Error opening file for writing {}: {}'.format(file_location, str(exc)))
+				logger.error('ERROR opening file for writing {}: {}'.format(file_location, str(exc)))
 				flash('ERROR retrieving document {}'.format(filename), 'error')
 				raise IOError
 				abort(404)
@@ -235,7 +236,7 @@ def move():
 @app.route('/motor/forward/<int:dist>', methods=['GET'])
 @login_required
 def forward(dist):
-	logger.debug('**DEBUG: FORWARD {} cms'.format(dist))
+	logger.debug('FORWARD {} cms'.format(dist))
 	flash('Moving forward {} cms'.format(dist),'message')
 	gopigo.fwd(dist)
 	return redirect(url_for('move'))
@@ -243,7 +244,7 @@ def forward(dist):
 @app.route('/motor/motor_forward', methods=['GET'])
 @login_required
 def motor_forward():
-	logger.debug('**DEBUG: MOTOR_FORWARD')
+	logger.debug('MOTOR_FORWARD')
 	flash('Moving forward until stopped','message' )
 	gopigo.fwd()
 	return redirect(url_for('move'))
@@ -251,7 +252,7 @@ def motor_forward():
 @app.route('/motor/backward/<int:dist>', methods=['GET'])
 @login_required
 def backward(dist):
-	logger.debug('**DEBUG: BACKWARD {} cms'.format(dist))
+	logger.debug('BACKWARD {} cms'.format(dist))
 	flash('Moving backward {} cms'.format(dist),'message')
 	gopigo.bwd(dist)
 	return redirect(url_for('move'))
@@ -259,7 +260,7 @@ def backward(dist):
 @app.route('/motor/motor_backward', methods=['GET'])
 @login_required
 def motor_backward():
-	logger.debug('**DEBUG: BACKWARD')
+	logger.debug('BACKWARD')
 	flash('Moving backward until stopped','message')
 	gopigo.motor_bwd()
 	return redirect(url_for('move'))
@@ -267,7 +268,7 @@ def motor_backward():
 @app.route('/motor/left', methods=['GET'])
 @login_required
 def left():
-	logger.debug('**DEBUG: LEFT')
+	logger.debug('LEFT')
 	flash('Rotating Left (slow)')
 	gopigo.left()
 	return redirect(url_for('move'))
@@ -275,7 +276,7 @@ def left():
 @app.route('/motor/left_rotation', methods=['GET'])
 @login_required
 def left_rotation():
-	logger.debug('**DEBUG: LEFT ROTATION')
+	logger.debug('LEFT ROTATION')
 	flash('Rotating Left (fast)','message')
 	gopigo.left_rot()
 	return redirect(url_for('move'))
@@ -283,7 +284,7 @@ def left_rotation():
 @app.route('/motor/left_turn/<int:degrees>', methods=['GET'])
 @login_required
 def left_turn(degrees):
-	logger.debug('**DEBUG: TURN LEFT {} degrees'.format(degrees),'message')
+	logger.debug('TURN LEFT {} degrees'.format(degrees),'message')
 	flash('Rotating Left {} degrees'.format(degrees))
 	gopigo.turn_left(degrees)
 	return redirect(url_for('move'))
@@ -291,7 +292,7 @@ def left_turn(degrees):
 @app.route('/motor/right', methods=['GET'])
 @login_required
 def right():
-	logger.debug('**DEBUG: RIGHT')
+	logger.debug('RIGHT')
 	flash('Rotating Right (slow)','message')
 	gopigo.right()
 	return redirect(url_for('move'))
@@ -299,7 +300,7 @@ def right():
 @app.route('/motor/right_rotation', methods=['GET'])
 @login_required
 def right_rotation():
-	logger.debug('**DEBUG: RIGHT ROTATION')
+	logger.debug('RIGHT ROTATION')
 	flash('Rotating Right (fast)','message')
 	gopigo.right_rot()
 	return redirect(url_for('move'))
@@ -307,7 +308,7 @@ def right_rotation():
 @app.route('/motor/right_turn/<int:degrees>', methods=['GET'])
 @login_required
 def right_turn(degrees):
-	logger.debug('**DEBUG: TURN RIGHT {} degrees'.format(degrees))
+	logger.debug('TURN RIGHT {} degrees'.format(degrees))
 	flash('Rotating Right {} degrees'.format(degrees),'message')
 	gopigo.turn_right(degrees)
 	return redirect(url_for('move'))
@@ -315,7 +316,7 @@ def right_turn(degrees):
 @app.route('/motor/stop', methods=['GET'])
 @login_required
 def stop():
-	logger.debug('**DEBUG: STOP')
+	logger.debug('STOP')
 	flash('Stopped','message')
 	gopigo.stop()
 	return redirect(url_for('move'))
@@ -330,9 +331,6 @@ def video():
 	'''
 
 	form_pic = FormPic()
-	
-	session['last_picture'] = os.path.basename(Config.EMPTY_PICTURE)
-
 
 	if form_pic.validate_on_submit():
 		#stop streaming from the camera to make it available for pictures
@@ -343,12 +341,11 @@ def video():
 		#Create the document in the database from the file
 		document = util.create_document_from_file(pic_location, "picture", current_user.id )
 		flash( "Picture taken and stored! {}".format(document.name), 'message')
-		session['last_picture'] = document.name
 		return redirect(url_for('video', formPic=form_pic, last_picture=document.name))
 
 		#picture just taken is now the last picture
 	picture_names=[]
-	for i, blob in enumerate(gcp.blobs_in_bucket()):
+	for i, blob in enumerate(reversed(list(gcp.blobs_in_bucket()))):		#return the most recent docs
 		filename = blob.name
 		picture_names.append( filename )
 		logger.debug( 'appended number {}: {}'.format(i, filename))
@@ -365,9 +362,9 @@ def video():
 
 	#Start streaming from the camera from the template including three thumbnails
 	return render_template('video.html', formPic=form_pic, 
-		last_picture=session.get('last_picture'),	#picture_names[0]
-		picture2=picture_names[0],		#picture2,
-		picture3=picture_names[1])		#picture3)
+		last_picture=picture_names[0],	#picture_names[0]
+		picture2=picture_names[1],		#picture2,
+		picture3=picture_names[2])		#picture3)
 
 
 @app.route('/video_feed')

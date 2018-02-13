@@ -20,6 +20,16 @@ def create_bucket( bucket_name ):
 	logger.debug('Bucket {} created.'.format(mybucket.name) )
 	return mybucket
 
+def bucket_exists( bucket_name ):
+	"""returns True if buckets exists, None otherwise"""
+	storage_client = storage.Client()
+	return storage_client.exists( bucket_name )
+
+def get_bucket( bucket_name ):
+	"""returns the bucket if it exists, None otherwise"""
+	storage_client = storage.Client()
+	return storage_client.get_bucket( bucket_name )
+
 def blobs_in_bucket():
 	"""yields the filenames in the bucket to a maximum of 3.
 	Used for getting the pictures for the video screen"""
