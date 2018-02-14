@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, g
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
@@ -10,6 +10,7 @@ from config import Config
 
 import os
 import sys
+import datetime
 import logging
 logger = logging.getLogger(Config.APP_NAME)
 
@@ -50,9 +51,13 @@ atexit.register(gopigo.stop)
 if not os.path.exists(Config.BASE_DIR):
     os.makedirs(Config.BASE_DIR)
 
-#initialize Video and Audio directory
+#initialize Video and Audio directory - not used if using GCP
 if not os.path.exists(Config.MEDIA_FOLDER):
     os.makedirs(Config.MEDIA_FOLDER)
+
+#init GCP application default credentials
+logger.debug('GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION is {}'.format(Config.GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION))
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = Config.GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION
 
 #initialize app -- TODO: add app blueprint
 from app import views, models
@@ -61,10 +66,36 @@ from app import views, models
 from .api_1_0 import api as api_1_0_blueprint
 app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0') 
 
+#init GCP storage bucket - specific for this session
+import util
+default_ifname =  util.get_default_iface_name_linux()
+mac_address = util.get_iface_mac_address(default_ifname)
+#bucket_name = "gopigo-server-"+str(datetime.datetime.now()).replace(" ", "").replace(":", "").replace(".", "")
+bucket_name = "gopigo-server-"+mac_address.replace(":", "")
+import gcp
+#find out whether the bucket exists, create otherwise
+#if gcp.bucket_exists(bucket_name):
+#	logger.info('GCS bucket {} exists, using it'.format(bucket_name))
+#	bucket = gcp.get_bucket(bucket_name)
+#else:
+#	logger.info('GCS bucket {} does not exist, creating it'.format(bucket_name))
+#	bucket = gcp.create_bucket(bucket_name)
+try:
+	bucket = gcp.get_bucket(bucket_name)
+	logger.info('GCS bucket {} already exists, using it'.format(bucket_name))
+except Exception as exc: #google.cloud.exceptions.Conflict: #means the bucket does not exist
+	logger.error('Exception getting bucket: {}'.format(exc))
+	logger.info('GCS bucket {} does not exist, creating it'.format(bucket_name))
+	bucket = gcp.create_bucket(bucket_name)
+Config.bucket_name = bucket.name
+logger.debug('Stored bucket {}'.format(Config.bucket_name))
+
 if __name__ == '__main__':
 	handler = RotatingFileHandler('foo.log', maxBytes=10000, backupCount=1)
 	handler.setLevel(logging.INFO)
 	app.logger.addHandler(handler)
+	logger.debug('about to run')
 	#manager.run( ','.join(map(str, Config.APP_RUN_OPTS)))
 	#manager.run(host="0.0.0.0", threaded=True)
 	manager.run(Config.APP_RUN_OPTS)
+	logger.debug('running')
