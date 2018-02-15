@@ -86,6 +86,17 @@ class Config (object):
 
 	bucket_name = "" #to be set on app init
 
+	#Vision API parameters
+	VISION_API_FEATURES_LIST=[
+		("1", "LABEL_DETECTION"),
+		("2", "TEXT_DETECTION"),
+		("3", "DOCUMENT_TEXT_DETECTION"),
+		("4", "FACE_DETECTION"),
+		("5", "LANDMARK_DETECTION"),
+		("6", "LOGO_DETECTION"),
+		("7", "SAFE_SEARCH_DETECTION"),
+		("8", "IMAGE_PROPERTIES")
+	    ]
 
 	
 	

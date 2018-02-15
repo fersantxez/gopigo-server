@@ -73,9 +73,21 @@ def create_uri_from_name( file_name ):
 	return uri
 
 #Vision API
-def vision_api( image_uri, feature ):
+def vision_api( picture, feature ):
 	""" run an image that resides in a bucket through the vision API. Speciy the feature (face or label detecion etc.) """
-	pass
+	picture_uri = create_uri_from_name( picture )
+	client = vision.ImageAnnotatorClient()
+	#feat_type = 'vision.enums.Feature.Type.'+feature. #FIXME: locate the right enum with the "feature" that indexes it
+	try:
+		response = client.annotate_image({
+			'image': {'source': {'image_uri': picture_uri}},
+			'features': [{'type': feature }],			#FIXME: vision.enums.Feature.Type.FACE_DETECTION}],
+			})
+		logger.debug('Received response is: {}'.format(response))
+		return response.annotations
+	except Exception as exc:
+		logger.error('ERROR calling Google Vision API for picture {}: {}'.format(picture, str(exc)))
+		flash('ERROR calling Google Vision API for document {}: {}'.format(picture, str(exc)), 'error')
 
 
 

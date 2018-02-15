@@ -82,7 +82,7 @@ def create_document_from_file( path, type, user_id ):
         db.session.add(document)
         db.session.commit()
         if not path == Config.EMPTY_PICTURE: 
-            os.remove(path)   #FIXME: emove the file from local disk
+            os.remove(path)   #FIXME: remove the file from local disk
         return document
 
     except Exception as exc:

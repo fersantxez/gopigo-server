@@ -3,7 +3,7 @@ from camera import Camera
 from app import app, db, login
 from app.forms import FormLogin, FormRegistration, FormForwardCms, FormBackwardCms, \
 	FormLeftTurnDegrees, FormRightTurnDegrees, FormPic, FormSettings, FormEdit, FormServo, FormDistance, \
-	FormListBuckets
+	FormListBuckets, FormVision
 from app.models import User, Document
 import app.util as util
 #OAuth Abstraction layer
@@ -420,17 +420,23 @@ def distance():
 		flash('I can see an object at {} cms from me'.format(distance), 'message')
 	return render_template('distance.html', form=form)
 
-#GCP
-@app.route('/gcp', methods=['GET', 'POST'])
+#Vision API
+@app.route('/vision', methods=['GET', 'POST'])
 @login_required
-def gcp_page():
-	"""Display the GCP test page"""
-	formListBuckets = FormListBuckets()
-	if formListBuckets.validate_on_submit():
-		buckets = gcp.list_buckets()
-		for i, bucket in enumerate(buckets):
-			flash('Found bucket number {}: {}'.format(i, bucket), 'message')
-	return render_template('gcp.html', formListBuckets=formListBuckets)
+def vision(picture=Config.EMPTY_PICTURE):
+	"""Display the GCP vision API page"""
+	formVision = FormVision()
+	logger.debug('Called /vision with picture: {}'.format(picture))
+	if formVision.validate_on_submit():
+		feature = Config.CAMERA_RES_LIST[int(formVision.feature.data)-1][1]
+		api_response = gcp.vision_api(picture, feature)
+		#TODO: FIXME: interpret API response
+		#api response will be a list of elements detected
+		for i, response in api_response:
+			logger.info('API response element {}: {}'.format(i, response))
+			flash('Thing {} Ive found is: {}'.format(i, response), 'message')
+			#TODO: USE VOICE TO SAY WHAT YOU SEE!!
+	return render_template('vision.html', form=formVision, picture=picture)
 
 #Error handlers - only for 404 and 500, others are API specific
 @app.errorhandler(404)

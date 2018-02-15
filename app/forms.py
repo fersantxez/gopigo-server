@@ -67,3 +67,7 @@ class FormDistance(FlaskForm):
 
 class FormListBuckets(FlaskForm):
     get_buckets = SubmitField('Get Available GCS buckets')
+
+class FormVision(FlaskForm):
+    feature = SelectField('What do you want to detect in the picture?',choices=Config.VISION_API_FEATURES_LIST)
+    submit = SubmitField('Submit')
