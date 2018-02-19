@@ -3,6 +3,7 @@ from google.cloud import storage, vision
 from google.cloud.vision import types
 
 import os
+import re #for cleaning special chars from strings
 import logging
 logger = logging.getLogger(Config.APP_NAME)
 
@@ -73,9 +74,115 @@ def create_uri_from_name( file_name ):
 	return uri
 
 #Vision API
-def vision_api( image_uri, feature ):
+def vision_api( picture, feature, unpack_function_name ):
 	""" run an image that resides in a bucket through the vision API. Speciy the feature (face or label detecion etc.) """
-	pass
+	picture_uri = create_uri_from_name( picture )
+	client = vision.ImageAnnotatorClient()
+	#feat_type = 'vision.enums.Feature.Type.'+feature. #FIXME: locate the right enum with the "feature" that indexes it
+	try:
+		response = client.annotate_image({
+			'image': {'source': {'image_uri': picture_uri}},
+			'features': [{'type': feature }],			#FIXME: vision.enums.Feature.Type.FACE_DETECTION}],
+			})
+		#logger.debug('Received response is: {}'.format(response))
+		#call each of the Vision API specific subfunctions to unpack
+		result = globals()[unpack_function_name](response)		#calls the associated unpack function
+		logger.debug('result from FUNCTION {} is: {}'.format(unpack_function_name, result))
+		return result
+	except Exception as exc:
+		logger.error('ERROR calling Google Vision API for picture {}: {}'.format(picture, str(exc)))
+		flash('ERROR calling Google Vision API for document {}: {}'.format(picture, str(exc)), 'error')
 
+def unpack_label_detection( response ):
+	"""unpack the result of a label detection call, return a list with the labels"""
+	logger.debug('Called unpack_label with: {}'.format(response))
+	result = []
+	for annotation in response.label_annotations:
+		logger.debug('Found annotation: {}'.format(annotation.description))
+		result.append(annotation.description)
+	logger.debug('result in unpack_label is: {}'.format(result))
+	return result
 
+def unpack_text_detection( response ):
+	"""unpack the result of a text detection call, return the legible text in a humanly fashion"""
+	logger.debug('Called unpack_text with: {}'.format(response))
+	result = []
+	result.append(response.text_annotations[0].description)	#the API returns first the entire text then each word
+	return result
 
+def unpack_document_text_detection( response ):
+	"""unpack the result of a document text detection call, return the legible text in a humanly fashion"""
+	result = []
+	text = str(response.full_text_annotation.text)
+	clean_text = re.sub('\W+','', text )
+	result.append(clean_text)	#the API returns first the entire text then each word
+	#for annotation in response.text_annotations:.
+	#	logger.debug('Found annotation: {}'.format(annotation.description))
+	#	result.append(annotation.description)
+	#logger.debug('result in unpack_text is: {}'.format(result))
+	return result
+
+def unpack_face_detection( response ):
+	"""unpack the result of a face detection call, return the faces and features"""
+	result = []
+	faces = response.face_annotations
+	for i, face in enumerate(faces): #AnnotateImageResponse' object is not iterable
+		logger.debug('Found annotation: {}'.format(i))
+		reply = "Person number "+str(i+1)+" shows " #number "+str(i)+"
+		reply += ', anger?: {}'.format(Config.LIKELIHOOD_NAME[face.anger_likelihood])
+		reply += ', joy?: {}'.format(Config.LIKELIHOOD_NAME[face.joy_likelihood])
+		reply += ', sorrow?: {}'.format(Config.LIKELIHOOD_NAME[face.sorrow_likelihood])
+		reply += ', surprise?: {}'.format(Config.LIKELIHOOD_NAME[face.surprise_likelihood])
+		result.append(reply)
+	logger.debug('result in unpack_face_detection is: {}'.format(result))
+	return result
+
+def unpack_landmark_detection( response ):
+	"""unpack the result of a landmark detection call, return the detected landmark"""
+	logger.debug('Called unpack_landmark with: {}'.format(response))
+	result = []
+	for annotation in response.landmark_annotations:
+		logger.debug('Found annotation: {}'.format(annotation.description))
+		result.append(annotation.description)
+	logger.debug('result in unpack_landmark is: {}'.format(result))
+	return result
+
+def unpack_logo_detection( response ):
+	"""unpack the result of a logo detection call, return the detected landmark"""
+	logger.debug('Called unpack_logo with: {}'.format(response))
+	result = []
+	for annotation in response.logo_annotations:
+		logger.debug('Found annotation: {}'.format(annotation.description))
+		result.append(annotation.description)
+	logger.debug('result in unpack_logo is: {}'.format(result))
+	return result
+
+def unpack_safe_search_detection( response ):
+	"""unpack the result of a safe search detection call, return the detected landmark"""
+	logger.debug('Called unpack_safe_search with: {}'.format(response))
+	result = []
+	safe = response.safe_search_annotation
+	reply = "The result of safe search on image shows " #number "+str(i)+"
+	reply += ', adult?: {}'.format(Config.LIKELIHOOD_NAME[safe.adult])
+	reply += ', medical?: {}'.format(Config.LIKELIHOOD_NAME[safe.medical])
+	reply += ', spoofed?: {}'.format(Config.LIKELIHOOD_NAME[safe.spoof])
+	reply += ', violence?: {}'.format(Config.LIKELIHOOD_NAME[safe.violence])
+	result.append(reply)
+	logger.debug('result in unpack_face_detection is: {}'.format(result))
+	return result
+
+def unpack_image_properties( response ):
+	"""unpack the result of a safe search detection call, return the detected landmark"""
+	logger.debug('Called unpack_image_properties with: {}'.format(response))
+	result = []
+	props = response.image_properties_annotation
+	for color in props.dominant_colors.colors:
+		reply = "The result of image detection properties on image shows " #number "+str(i)+"
+		reply += ', fraction: {}'.format(color.pixel_fraction)
+		reply += ', red: {}'.format(color.color.red)
+		reply += ', green: {}'.format(color.color.green)
+		reply += ', blue: {}'.format(color.color.blue)
+		reply += ', alpha: {}'.format(color.color.alpha)
+	result.append(reply)
+	logger.debug('result in unpack_image_properties is: {}'.format(result))
+	return result

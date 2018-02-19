@@ -3,7 +3,7 @@ from camera import Camera
 from app import app, db, login
 from app.forms import FormLogin, FormRegistration, FormForwardCms, FormBackwardCms, \
 	FormLeftTurnDegrees, FormRightTurnDegrees, FormPic, FormSettings, FormEdit, FormServo, FormDistance, \
-	FormListBuckets
+	FormListBuckets, FormVision
 from app.models import User, Document
 import app.util as util
 #OAuth Abstraction layer
@@ -353,8 +353,8 @@ def video():
 			break
 	#if there are not enough pics in bucket, fill with EMPTY_PICTURE
 	while len(picture_names) < 3:
-		picture_names.append( os.path.basename(Config.EMPTY_PICTURE) )
-		logger.debug('appending an empty picture')
+		picture_names.append( Config.EMPTY_PICTURE )
+		logger.debug('appending an empty picture: {}'.format( Config.EMPTY_PICTURE ))
 
 	#TODO:check whether the camera is present and the streaming SW is ready
 		#otherwise show processing message and install it if possible
@@ -420,17 +420,26 @@ def distance():
 		flash('I can see an object at {} cms from me'.format(distance), 'message')
 	return render_template('distance.html', form=form)
 
-#GCP
-@app.route('/gcp', methods=['GET', 'POST'])
+#Vision API
+@app.route('/vision/<picture>', methods=['GET', 'POST'])
 @login_required
-def gcp_page():
-	"""Display the GCP test page"""
-	formListBuckets = FormListBuckets()
-	if formListBuckets.validate_on_submit():
-		buckets = gcp.list_buckets()
-		for i, bucket in enumerate(buckets):
-			flash('Found bucket number {}: {}'.format(i, bucket), 'message')
-	return render_template('gcp.html', formListBuckets=formListBuckets)
+def vision(picture=Config.EMPTY_PICTURE):
+	"""Display the GCP vision API page"""
+	formVision = FormVision()
+	logger.debug('Called /vision with picture: {}'.format(picture))
+	if formVision.validate_on_submit():
+		feature = Config.VISION_API_FEATURES_LIST[int(formVision.feature.data)-1][1]
+		logger.debug('Calling GCP vision with picture: {} and feature: {}'.format(picture, feature))
+		unpack_function_name = Config.VISION_API_UNPACK_FUNCTIONS[feature]
+		logger.debug('UNPACK function name is: {}'.format(unpack_function_name))
+		api_replies_list = gcp.vision_api(picture, feature, unpack_function_name)
+		#TODO: FIXME: interpret API response
+		#api response will be a list of elements detected
+		for i, response in enumerate(api_replies_list):
+			logger.info('API response element {}: {}'.format(i, response))
+			flash('Thing {} Ive found is: {}'.format(i+1, response), 'message')
+			util.sound(response)
+	return render_template('vision.html', form=formVision, picture=picture)
 
 #Error handlers - only for 404 and 500, others are API specific
 @app.errorhandler(404)

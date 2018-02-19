@@ -39,7 +39,7 @@ def sound(spk):
     #  Run the command espeak --voices for a list of voices.
     #   -s180:      set reading to 180 Words per minute
     #   -k20:       Emphasis on Capital letters
-    call(" amixer set PCM 100 ", shell=True)    # Crank up the volume!
+    call(" amixer set PCM 60 ", shell=True)    # Crank up the volume!
 
     cmd_beg=" espeak -ven-us+m2 -a 200 -s145 -k20 --stdout '"
     cmd_end="' | aplay"
@@ -82,7 +82,7 @@ def create_document_from_file( path, type, user_id ):
         db.session.add(document)
         db.session.commit()
         if not path == Config.EMPTY_PICTURE: 
-            os.remove(path)   #FIXME: emove the file from local disk
+            os.remove(path)   #FIXME: remove the file from local disk
         return document
 
     except Exception as exc:
