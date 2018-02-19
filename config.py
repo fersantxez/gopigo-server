@@ -14,7 +14,8 @@ class Config (object):
 	#Working directories
 	BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 	MEDIA_FOLDER = os.path.join(BASE_DIR, 'app', 'static', 'media')	#for static content
-	EMPTY_PICTURE= os.path.join(MEDIA_FOLDER, 'dex-advanced.png')
+	#EMPTY_PICTURE= os.path.join(MEDIA_FOLDER, 'dex-advanced.png
+	EMPTY_PICTURE='dex-advanced.png'
 
 	DATABASE_FILE_NAME = "app.db"
 
@@ -86,7 +87,7 @@ class Config (object):
 
 	bucket_name = "" #to be set on app init
 
-	#Vision API parameters
+	#Vision API parameters and function associated with each that processes the API response
 	VISION_API_FEATURES_LIST=[
 		("1", "LABEL_DETECTION"),
 		("2", "TEXT_DETECTION"),
@@ -98,6 +99,29 @@ class Config (object):
 		("8", "IMAGE_PROPERTIES")
 	    ]
 
+	VISION_API_UNPACK_FUNCTIONS={
+	"LABEL_DETECTION": "unpack_label_detection",
+	"TEXT_DETECTION": "unpack_text_detection",
+	"DOCUMENT_TEXT_DETECTION": "unpack_document_text_detection",
+	"FACE_DETECTION": "unpack_face_detection",
+	"LANDMARK_DETECTION": "unpack_landmark_detection",
+	"LOGO_DETECTION": "unpack_logo_detection",
+	"SAFE_SEARCH_DETECTION": "unpack_safe_search_detection",
+	"IMAGE_PROPERTIES": "unpack_image_properties"
+	}
+
+	#how to describe each feature from the face detection api
+	FACE_DETECTION_FEATURES={
+	"joy_likelihood":	"joy",
+	"sorrow_likelihood":	"sorrow",
+	"anger_likelihood":	"anger",
+	"surprise_likelihood":	"surprise",
+	"headwear_likelihood":	"headwear"
+	}
+
+	#when to consider a value as detected
+	LIKELIHOOD_NAME = ('UNKNOWN', 'VERY_UNLIKELY', 'UNLIKELY', 'POSSIBLE', 'LIKELY', 'VERY_LIKELY')
+	ACCEPTED_LIKELIHOOD = ("VERY_LIKELY", "LIKELY")   #"POSSIBLE"
 	
 	
 	
