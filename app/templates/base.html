@@ -28,7 +28,8 @@
 					<li><a href="{{ url_for('video') }}">Video</a></li>
 					<li><a href="{{ url_for('servo') }}">Servo</a></li>
 					<li><a href="{{ url_for('distance') }}">Distance</a></li>
-					<li><a href="{{ url_for('vision', picture='dex-advanced.png') }}">GCP Vision</a></li>	
+					<li><a href="{{ url_for('vision', picture='dex-advanced.png') }}">Vision</a></li>
+					<li><a href="{{ url_for('voice', topic='human resources') }}">Chatbot</a></li>
 					<li><a href="{{ url_for('register') }}">Add User</a></li>
 					<li><a href="{{ url_for('settings') }}">Settings</a></li>				
 					<li><a href="{{ url_for('logout') }}">Logout {{ current_user.email }}</a></li>

@@ -23,7 +23,7 @@ fi
 #point Flask to the Main app
 export FLASK_APP=gopigo-server.py
 export FLASK_DEBUG=1
-export FLASK_DEBUG=0
+#export FLASK_DEBUG=0
 
 #run
 ${PYTHON} run.py

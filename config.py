@@ -13,12 +13,10 @@ class Config (object):
 	
 	#Working directories
 	BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-	MEDIA_FOLDER = os.path.join(BASE_DIR, 'app', 'static', 'media')	#for static content
+	MEDIA_DIR = os.path.join(BASE_DIR, 'app', 'static', 'media')	#for static content
 	#EMPTY_PICTURE= os.path.join(MEDIA_FOLDER, 'dex-advanced.png
 	EMPTY_PICTURE='dex-advanced.png'
-
 	DATABASE_FILE_NAME = "app.db"
-
 	PORT = 5000
 	
 	DEBUG_MODE = True
@@ -123,5 +121,17 @@ class Config (object):
 	LIKELIHOOD_NAME = ('UNKNOWN', 'VERY_UNLIKELY', 'UNLIKELY', 'POSSIBLE', 'LIKELY', 'VERY_LIKELY')
 	ACCEPTED_LIKELIHOOD = ("VERY_LIKELY", "LIKELY")   #"POSSIBLE"
 	
+	#Audio config
+	PLAYBACK_DEVICE=""
+	RECORDING_DEVICE="sysdefault:CARD=Device"
+	AUDIO_SAMPLE_SIZE = 2  # bytes per sample
+	AUDIO_SAMPLE_RATE_HZ = 16000
+	TTS_VOLUME = 60
+	TTS_PITCH = 130
+	TTS_VOICE = 'm2' #The variants are +m1 +m2 +m3 +m4 +m5 +m6 +m7 for male voices and +f1 +f2 +f3 +f4 which
+					 # simulate female voices by using higher pitches. Other variants include +croak and +whisper.
+	TTS_LANGUAGE = 'en-US'
+	
+
 	
 	

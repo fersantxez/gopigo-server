@@ -3,9 +3,10 @@ from camera import Camera
 from app import app, db, login
 from app.forms import FormLogin, FormRegistration, FormForwardCms, FormBackwardCms, \
 	FormLeftTurnDegrees, FormRightTurnDegrees, FormPic, FormSettings, FormEdit, FormServo, FormDistance, \
-	FormListBuckets, FormVision
+	FormListBuckets, FormVision, FormRecordAudio
 from app.models import User, Document
 import app.util as util
+import app.audio as audio
 #OAuth Abstraction layer
 from app.oauth import OAuthSignIn, FacebookSignIn, TwitterSignIn
 import app.gcp as gcp
@@ -18,7 +19,8 @@ from werkzeug.urls import url_parse
 from datetime import datetime
 from socket import gethostname
 import os
-import random #random pics
+from time import sleep
+
 
 import gopigo
 
@@ -153,7 +155,7 @@ def send_file(filename):
 	"""Serve a file by the name. Searches for the location in the dB, downloads it to disk and returns it"""
 	logger.debug('REQUESTED DOCUMENT: {}'.format(filename))
 	#if it doesn't exist on MEDIA, search in GCS and send_or_404
-	file_location = os.path.join(Config.MEDIA_FOLDER,filename)
+	file_location = os.path.join(Config.MEDIA_DIR,filename)
 	if not os.path.exists(file_location):
 	#find "filename" in the Database
 		document = Document.query.filter_by(name=filename).first()
@@ -177,7 +179,7 @@ def send_file(filename):
 			flash('Document {} NOT FOUND'.format(filename), 'error')
 			abort(404)
 
-	return send_from_directory(Config.MEDIA_FOLDER,filename)
+	return send_from_directory(Config.MEDIA_DIR,filename)
 
 @app.route('/register', methods=['GET', 'POST'])
 @login_required
@@ -284,8 +286,8 @@ def left_rotation():
 @app.route('/motor/left_turn/<int:degrees>', methods=['GET'])
 @login_required
 def left_turn(degrees):
-	logger.debug('TURN LEFT {} degrees'.format(degrees),'message')
-	flash('Rotating Left {} degrees'.format(degrees))
+	logger.debug('TURN LEFT {} degrees'.format(degrees))
+	flash('Rotating Left {} degrees'.format(degrees),'message')
 	gopigo.turn_left(degrees)
 	return redirect(url_for('move'))
 
@@ -433,13 +435,45 @@ def vision(picture=Config.EMPTY_PICTURE):
 		unpack_function_name = Config.VISION_API_UNPACK_FUNCTIONS[feature]
 		logger.debug('UNPACK function name is: {}'.format(unpack_function_name))
 		api_replies_list = gcp.vision_api(picture, feature, unpack_function_name)
-		#TODO: FIXME: interpret API response
-		#api response will be a list of elements detected
+		if not api_replies_list:
+			logger.info('API response empty')
+			flash('Nothing found','error')
 		for i, response in enumerate(api_replies_list):
 			logger.info('API response element {}: {}'.format(i, response))
 			flash('Thing {} Ive found is: {}'.format(i+1, response), 'message')
-			util.sound(response)
+			#util.sound(response)
+			audio.say(response)
 	return render_template('vision.html', form=formVision, picture=picture)
+
+#Voice recognition and Chatbot
+@login_required
+@app.route('/voice/<topic>', methods=['GET', 'POST'])
+def voice(topic='human resources'):
+	"""Display the Chatbot page"""
+	form = FormRecordAudio()
+	if form.validate_on_submit():
+		#record and play the audio
+		if form.start_recording.data:
+			#start recording
+			filename=util.filename_from_date('audio', 'wav')
+			filepath=os.path.join(Config.MEDIA_DIR, filename)
+			flash('Audio recording started','message')
+			logger.debug('Audio recording started to {}'.format(filepath))
+			audio.listen(filepath, 5) #listen for 5 seconds
+			#wait until the recording is finished
+			sleep(6)
+			flash('Audio recording finished, playing recording','message')
+			logger.debug('Audio recording finished. Playing')
+			audio.play_wave(filepath)
+			logger.debug('PLAY finished, returning to page')
+			flash('Audio recording Play finished, thank you for your collaboration','message')
+			#os.remove(filename)
+		if form.stop_recording.data:
+			#do something with the audio
+			#read the recording aloud
+			flash('AUDIO recording STOP is not supported yet','message')
+			logger.debug('AUDIO recording STOP is not supported yet')
+	return render_template('voice.html', topic=topic, form=form)
 
 #Error handlers - only for 404 and 500, others are API specific
 @app.errorhandler(404)

@@ -31,21 +31,6 @@ def get_iface_mac_address(ifname):
     info = fcntl.ioctl(s.fileno(), 0x8927,  struct.pack('256s', ifname[:15]))
     return ':'.join(['%02x' % ord(char) for char in info[18:24]])
 
-def sound(spk):
-    #Calls the Espeak TTS Engine to read aloud a sentence
-    # This function is going to read aloud some text over the speakers
-    #   -ven+m7:    Male voice
-    #  The variants are +m1 +m2 +m3 +m4 +m5 +m6 +m7 for male voices and +f1 +f2 +f3 +f4 which simulate female voices by using higher pitches. Other variants include +croak and +whisper.
-    #  Run the command espeak --voices for a list of voices.
-    #   -s180:      set reading to 180 Words per minute
-    #   -k20:       Emphasis on Capital letters
-    call(" amixer set PCM 60 ", shell=True)    # Crank up the volume!
-
-    cmd_beg=" espeak -ven-us+m2 -a 200 -s145 -k20 --stdout '"
-    cmd_end="' | aplay"
-    print cmd_beg+spk+cmd_end
-    call ([cmd_beg+spk+cmd_end], shell=True)
-
 def filename_from_date( file_type, extension ):
     """Generate a filename for a media file based on the current time"""
     date_string = str(datetime.datetime.now())
@@ -98,7 +83,7 @@ def take_photo():
     camera = picamera.PiCamera()
     camera.resolution = (Config.CAMERA_RES_X, Config.CAMERA_RES_Y)
     camera.sharpness = Config.CAMERA_SHARPNESS
-    file_location = os.path.join(Config.MEDIA_FOLDER, filename_from_date)
+    file_location = os.path.join(Config.MEDIA_DIR, filename_from_date)
     camera.capture( file_location )
     camera.close()  # We need to close off the resources or we'll get an error.
 
@@ -108,7 +93,7 @@ def take_photo_from_last_frame(camera):
     """Creates a picture document with the last frame received in the camera"""
     frame = camera.get_frame()
     #save frame to file for temp storage and display
-    file_location = os.path.join(Config.MEDIA_FOLDER, filename_from_date( 'picture', 'jpg'))
+    file_location = os.path.join(Config.MEDIA_DIR, filename_from_date( 'picture', 'jpg'))
     logger.debug('Writing file to {}'.format(file_location))
     with open (file_location, 'wb') as file:
         file.write(frame)

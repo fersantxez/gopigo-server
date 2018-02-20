@@ -1,11 +1,14 @@
 from config import Config
-from google.cloud import storage, vision 
-from google.cloud.vision import types
+from google.cloud import storage, vision, speech 
+#from google.cloud.vision import types
+from google.cloud.speech import enums, types
 
 import os
 import re #for cleaning special chars from strings
 import logging
 logger = logging.getLogger(Config.APP_NAME)
+
+import app.audio
 
 #GCS
 def list_buckets():
@@ -186,3 +189,5 @@ def unpack_image_properties( response ):
 	result.append(reply)
 	logger.debug('result in unpack_image_properties is: {}'.format(result))
 	return result
+
+#Speech API

@@ -71,3 +71,7 @@ class FormListBuckets(FlaskForm):
 class FormVision(FlaskForm):
     feature = SelectField('What do you want to detect in the picture?',choices=Config.VISION_API_FEATURES_LIST)
     submit = SubmitField('Submit')
+
+class FormRecordAudio(FlaskForm):
+    start_recording = SubmitField('Start recording')
+    stop_recording = SubmitField('Stop recording')
