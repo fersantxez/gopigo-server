@@ -182,7 +182,6 @@ def fwd(dist=0): #distance is in cm
 			#pulse=int(PPR*(dist//WHEEL_CIRC) )
 			#TODO: fix this for accuracy
 			pulse=int(PPR*(dist/WHEEL_CIRC))+1
-			#print('**DEBUG: PPR is: {}, dist is {}, WHEEL_CIRC is {}, pulse is {}'.format(PPR, dist, WHEEL_CIRC, pulse))
 			enc_tgt(1,1,pulse)
 	except Exception as e:
 		print ("gopigo fwd: {}".format(e))
@@ -203,7 +202,6 @@ def bwd(dist=0):
 			#pulse=int(PPR*(dist//WHEEL_CIRC) )
 			#TODO: fix this for accuracy
 			pulse=int(PPR*(dist/WHEEL_CIRC))+1
-			#print('**DEBUG: PPR is: {}, dist is {}, WHEEL_CIRC is {}, pulse is {}'.format(PPR, dist, WHEEL_CIRC, pulse))
 			enc_tgt(1,1,pulse)
 	except Exception as e:
 		print ("gopigo bwd: {}".format(e))
@@ -502,7 +500,6 @@ def servo(position):
 #	m2:	1 to disable targeting for m2, 1 to enable it
 #	target: number of encoder pulses to target (18 per revolution)
 def enc_tgt(m1,m2,target):
-	print("enc_tgt m1 {} m2 {} target {}".format(m1,m2,target))
 	if m1>1 or m1<0 or m2>1 or m2<0:
 		return -1
 	m_sel=m1*2+m2
