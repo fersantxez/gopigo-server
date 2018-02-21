@@ -1,6 +1,6 @@
 #!venv/bin/python
 from config import Config
-from app import app
+from gopigoserver import app
 
 import logging
 logger = logging.getLogger(Config.APP_NAME)
