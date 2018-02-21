@@ -3,9 +3,9 @@
 # init_db: create an initial User for admin purposes with a password to be obtained from the user
 
 from config import Config
-from app import db
-from app.models import User, Document
-from app.util import create_document_from_file
+from gopigoserver import db
+from gopigoserver.models import User, Document
+from gopigoserver.util import create_document_from_file
 
 import argparse, os
 from sys import exit
