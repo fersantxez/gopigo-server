@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+<div class="media">
+  <div class="media-body">
+	<h3 class="media-heading">LIVE video feed.</h3>
+		<p>Press the button on the right to Take a Picture</p>
+  </div>
+   <div class="media-right">
+		<form action="" method="POST">
+			{{ formPic.hidden_tag() }}
+			<p>{{ formPic.pic_submit }}</p>
+		</form>
+   </div>
+ </div>
+ <div class="embed-responsive embed-responsive-16by9">
+	<iframe class="embed-responsive-item" src="{{ url_for('video_feed') }}"></iframe>
+</div>
+{% if picture1 %}
+<div class="container-fluid">
+  <div class="jumbotron">
+  <h4>Previous pictures</h4>
+    <div class="row vertical-align">
+      <div class="col-xs-3">
+        <a href="{{ url_for('vision', picture=picture1, _external=True ) }}" title=""><img src="{{ url_for('send_file', filename=picture1, _external=True ) }}" class="img-responsive" alt="Last Picture"></a>
+      </div>
+    <div class="col-xs-3">
+        <a href="{{ url_for('vision', picture=picture2, _external=True ) }}" title=""><img src="{{ url_for('send_file', filename=picture2, _external=True ) }}" class="img-responsive" class="img-responsive" alt="Last Picture"></a>
+    </div>
+    <div class="col-xs-3">
+        <a href="{{ url_for('vision', picture=picture3, _external=True ) }}" title=""><img src="{{ url_for('send_file', filename=picture3, _external=True ) }}" class="img-responsive" class="img-responsive" alt="Last Picture"></a>
+    </div>
+  </div>
+</div>
+</div>
+{% endif %}
+{% endblock %}
+
+
+

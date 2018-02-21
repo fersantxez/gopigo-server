@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+<div class="media">
+  <div class="media-body">
+	<h3 class="media-heading">Welcome to the GoPiGo Chatbot!</h3>
+		<p>Today we are chatting about <strong>{{ topic }}</strong></p>
+		<p>Start a conversation with "Hola Manolo" </p>
+  </div>
+</div>
+<div class="btn-group btn-group-justified">
+   <div class="media-right">
+		<form action="" method="POST">
+			{{ form.hidden_tag() }}
+			<p>{{ form.start_recording }}</p>
+			<p>{{ form.stop_recording }}</p>
+		</form>
+   </div>
+</div>
+
+{% endblock %}
+
+
+

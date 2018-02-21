@@ -3,9 +3,9 @@
 # init_db: create an initial User for admin purposes with a password to be obtained from the user
 
 from config import Config
-from app import db
-from app.models import User, Document
-from app.util import create_document_from_file
+from gopigoserver import db
+from gopigoserver.models import User, Document
+from gopigoserver.util import create_document_from_file
 
 import argparse, os
 from sys import exit
@@ -35,8 +35,8 @@ if __name__ == "__main__":
 
 
 	#if arguments were not passed, ask for them interactively
-	username = args.get('username') or raw_input("Please enter username to initialize the App with: ")
-	password = args.get('password') or raw_input("Please enter password for user {}: ".format(username))		
+	username = args.get('username') or input("Please enter username to initialize the App with: ")
+	password = args.get('password') or input("Please enter password for user {}: ".format(username))		
 
 	logger.debug('**DEBUG: about to create a Superuser named {} with password {}'.format(username, password))
 	#app.logger.info('About to create a Superuser named {} with password {}'.format(args.get('username'), args.get('password')))
@@ -60,7 +60,8 @@ if __name__ == "__main__":
 
 	#create three pictures with the default icon
 	for i in range(1,4):
-		document = create_document_from_file( Config.EMPTY_PICTURE, type="picture", user_id=admin_user.id )
+		empty_picture_full_path = os.path.join( Config.MEDIA_DIR, Config.EMPTY_PICTURE )
+		document = create_document_from_file( empty_picture_full_path, type="picture", user_id=admin_user.id )
 		if document:
 			logger.debug("**DEBUG: Created document {} with name {}".format(document.id, document.name))
 		else:

@@ -5,4 +5,4 @@
 /app.db
 /*.pyc
 /app/*.pyc
-
+/migrations
