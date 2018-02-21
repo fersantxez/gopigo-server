@@ -18,8 +18,8 @@ import picamera
 
 from gopigoserver import db
 from gopigoserver.models import Document
-import gopigoserver.gcp
-import gopigoserver.camera
+import gopigoserver.gcp as gcp
+import gopigoserver.camera as camera
 
 
 #####################

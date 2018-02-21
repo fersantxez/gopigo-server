@@ -24,10 +24,10 @@ from gopigoserver.forms import FormLogin, FormRegistration, FormForwardCms, Form
     FormListBuckets, FormVision, FormRecordAudio
 from gopigoserver.models import User, Document
 import gopigoserver.util as util
-import gopigoserver.audio as audior
+import gopigoserver.audio as audio
 from gopigoserver.oauth import OAuthSignIn, FacebookSignIn, TwitterSignIn
 import gopigoserver.gcp as gcp
-import gopigoserver.gopigo
+import gopigoserver.gopigo as gopigo
 
 
 #####################
@@ -392,9 +392,12 @@ def video():
         pic_location = util.take_photo_from_last_frame(Camera())
         #Create the document in the database from the file
         document = util.create_document_from_file(pic_location, "picture", current_user.id )
-        flash( "Picture taken and stored! {}".format(document.name), 'message')
-        return redirect(url_for('video', formPic=form_pic, last_picture=document.name))
-
+        if document:
+            flash( "Picture taken and stored! {}".format(document.name), 'message')
+            return redirect(url_for('video', formPic=form_pic, last_picture=document.name))
+        else:
+            flash( "Error taking picture!", 'error')
+    
     recent_pictures=[]    #Holds the pictures that will be shown in the menu as "recent pictures"
     for i, blob in enumerate(reversed(list(gcp.blobs_in_bucket()))):        #return the most recent docs
         filename = blob.name
@@ -500,7 +503,7 @@ def distance():
 
 
 #####################
-#  Vision           #
+#  Vision API       #
 #####################
 
 #Vision API
@@ -529,7 +532,7 @@ def vision(picture=Config.EMPTY_PICTURE):
 
 
 #####################
-#  Speech           #
+#  Speech API       #
 #####################
 
 #Voice recognition and Chatbot
