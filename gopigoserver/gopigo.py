@@ -1,4 +1,7 @@
 #!venv/bin/python
+from __future__ import print_function
+from __future__ import division
+#
 
 '''
 ## License
@@ -25,19 +28,9 @@ This library is used for communicating with the GoPiGo.
 Shamelessly copied from:
 https://github.com/DexterInd/GoPiGo/blob/master/Software/Python/gopigo.py
 '''
-
 from config import Config
 import logging
 logger = logging.getLogger(Config.APP_NAME)
-
-from __future__ import print_function
-from __future__ import division
-# the above lines are meant for Python3 compatibility.
-# they force the use of Python3 functionality for print()
-# and the integer division
-# mind your parentheses!
-
-
 
 import sys
 import time
