@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
 	#create three pictures with the default icon
 	for i in range(1,4):
-		empty_picture_full_path = os.path.join( Config.MEDIA_FOLDER, Config.EMPTY_PICTURE )
+		empty_picture_full_path = os.path.join( Config.MEDIA_DIR, Config.EMPTY_PICTURE )
 		document = create_document_from_file( empty_picture_full_path, type="picture", user_id=admin_user.id )
 		if document:
 			logger.debug("**DEBUG: Created document {} with name {}".format(document.id, document.name))
