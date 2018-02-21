@@ -1,0 +1,22 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block page_content %}
+  <table>
+      <tr valign="top">
+          <td>
+              {% if user.avatar(128) %}<img src="{{ user.avatar(128) }}">{% endif %}
+          </td>
+          <td>
+              <h1>User: {{user.username}}</h1>
+              {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
+              {% if user.last_seen %}<p><i>Last seen on: {{ user.last_seen }}</i></p>{% endif %}
+              {% if user.id == g.user.id %}<p><a href="{{ url_for('edit') }}">Edit</a></p>{% endif %}
+          </td>
+      </tr>
+  </table>
+  <hr>
+  {% for document in documents %}
+      {% include 'document.html' %}
+  {% endfor %}
+{% endblock %}

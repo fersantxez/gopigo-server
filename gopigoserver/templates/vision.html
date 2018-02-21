@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+<div class="media">
+  <div class="media-body">
+	<h3 class="media-heading">Google Vision API.</h3>
+		<p>Choose a labeling feature and submit for labeling.</p>
+		<p><strong>NOTE:</strong></p>
+		<p>This feature should be accessed from the "Video" menu</p>
+		<p>If accessed directly, the picture on the right will be empty</p>
+  </div>
+  <div class="media-left">
+	<a href={{ picture }} title=""><img src="{{ url_for('send_file', filename=picture, _external=True ) }}" class="img-fluid" alt="Picture to annotate"></a>
+  </div>
+  <div class="media-right">
+		<form action="" method="POST">
+			{{ form.hidden_tag() }}
+			<p>{{ form.feature.label }} {{ form.feature(size=20) }}</p>
+			<p>{{ form.submit }}</p>
+		</form>
+  </div>
+</div>
+{% endblock %}
+
+
+
