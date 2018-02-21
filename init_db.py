@@ -35,8 +35,8 @@ if __name__ == "__main__":
 
 
 	#if arguments were not passed, ask for them interactively
-	username = args.get('username') or raw_input("Please enter username to initialize the App with: ")
-	password = args.get('password') or raw_input("Please enter password for user {}: ".format(username))		
+	username = args.get('username') or input("Please enter username to initialize the App with: ")
+	password = args.get('password') or input("Please enter password for user {}: ".format(username))		
 
 	logger.debug('**DEBUG: about to create a Superuser named {} with password {}'.format(username, password))
 	#app.logger.info('About to create a Superuser named {} with password {}'.format(args.get('username'), args.get('password')))
