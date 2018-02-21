@@ -9,7 +9,7 @@ export DB_FILENAME=${PWD}/app.db
 export INIT_DB=${PWD}/init_db.py
 
 if [ ! -d "$VENV_DIR" ]; then
-	virtualenv $VENV_DIR
+	virtualenv -p python3 $VENV_DIR
 fi
 #not needed on a virtual environment#
 # for other systems
