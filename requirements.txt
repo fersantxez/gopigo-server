@@ -7,15 +7,14 @@ flask-login
 flask-sqlalchemy
 flask-migrate
 flask-whooshalchemy
-
 itsdangerous
-
 flask-httpauth
 
 rpi.gpio
 smbus-cffi	#not needed for gopigo?
 picamera
 rauth
+netifaces
 
 google-cloud
 
