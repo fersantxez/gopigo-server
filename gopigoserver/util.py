@@ -12,8 +12,8 @@ logger = logging.getLogger(Config.APP_NAME)
 from subprocess import call
 import datetime
 import os
-import io #to write JPG to file as string
-import fcntl, socket, struct
+import io
+import netifaces
 import picamera
 
 from gopigoserver import db
@@ -27,6 +27,9 @@ import gopigoserver.camera as camera
 #####################
 
 def get_default_iface_name_linux():
+    '''
+    get the default interface name as a string
+    '''
     route = "/proc/net/route"
     with open(route) as f:
         for line in f.readlines():
@@ -40,10 +43,11 @@ def get_default_iface_name_linux():
 
 
 def get_iface_mac_address(ifname='eth0'):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    #info = fcntl.ioctl(bytes([s.fileno()]), 0x8927,  struct.pack('256s', ifname[:15]))
-    #return ':'.join(['%02x' % ord(char) for char in info[18:24]])
-    return"ca:fe:ca:fe:ca:fe"
+    '''
+    get the mac address from the interface passed as a parameter
+    '''
+    macaddr = netifaces.ifaddresses(ifname)[netifaces.AF_LINK][0].get('addr')
+    return macaddr
 
 
 #####################
@@ -51,7 +55,9 @@ def get_iface_mac_address(ifname='eth0'):
 #####################
 
 def filename_from_date( file_type, extension ):
-    """Generate a filename for a media file based on the current time"""
+    '''
+    Generate a filename for a media file based on the current time
+    '''
     date_string = str(datetime.datetime.now())
     date_string = file_type+'-'+date_string+'.'+extension
     date_string = date_string.replace(":", "")  # Strip out the colon from date time.
@@ -60,9 +66,10 @@ def filename_from_date( file_type, extension ):
     return date_string
 
 def create_document_from_file( path, type, user_id ):
-    """create an object with all the metadata from a file.
-    Uploads it to the database as a full object"""
-
+    '''
+    create an object with all the metadata from a file.
+    Uploads it to the database as a full object
+    '''
     logger.debug('Creating document from file {}'.format(path))
     try:
         with open(path, 'rb') as input_file:
@@ -99,10 +106,12 @@ def create_document_from_file( path, type, user_id ):
 #####################
 
 def take_photo():
-    #Takes a picture from the camera
-    #returns the location of the file created. 
-    #this is BLOCKING so it can't be used simultaneously with the streaming. For 
-    #that, use take_photo_from_last_frame below
+    '''
+    Takes a picture from the camera
+    returns the location of the file created. 
+    this is BLOCKING so it can't be used simultaneously with the streaming. For 
+    that, use take_photo_from_last_frame below
+    '''
     date_string = str(datetime.datetime.now())
     camera = picamera.PiCamera()
     camera.resolution = (Config.CAMERA_RES_X, Config.CAMERA_RES_Y)
@@ -114,7 +123,9 @@ def take_photo():
     return file_location
     
 def take_photo_from_last_frame(camera):
-    """Creates a picture document with the last frame received in the camera"""
+    '''
+    Creates a picture document with the last frame received in the camera
+    '''
     frame = camera.get_frame()
     #save frame to file for temp storage and display
     file_location = os.path.join(Config.MEDIA_DIR, filename_from_date( 'picture', 'jpg'))
