@@ -1,6 +1,5 @@
 #!venv/bin/python
 
-
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 '''
 Classes for speech interaction
 Shamelessly copied from:
@@ -58,7 +56,7 @@ AUDIO_SAMPLE_SIZE = 2  # bytes per sample
 AUDIO_SAMPLE_RATE_HZ = 16000
 
 # Expected location of the service credentials file:
-SERVICE_CREDENTIALS = Config.GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION #os.path.expanduser('~/cloud_speech.json')
+SERVICE_CREDENTIALS = Config.GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION  #os.path.expanduser('~/cloud_speech.json')
 
 _Result = collections.namedtuple('_Result', ['transcript', 'response_audio'])
 

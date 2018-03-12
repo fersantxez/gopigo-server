@@ -1,6 +1,4 @@
-
 #!venv/bin/python
-
 '''
 Class to expose the camera to the app.
 Shamelessly copied from:
@@ -27,6 +25,7 @@ class CameraEvent(object):
     """An Event-like class that signals all active clients when a new frame is
     available.
     """
+
     def __init__(self):
         self.events = {}
 

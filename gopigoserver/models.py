@@ -1,5 +1,4 @@
 #!venv/bin/python
-
 '''
 Flask app models and DB schemas etc.
 '''
@@ -68,50 +67,63 @@ class User(UserMixin, db.Model):
 
     #Token for HTTP Auth (API calls)
     def generate_auth_token(self, expiration):
-        s = Serializer(current_app.config['SECRET_KEY'],
-                    expires_in=Config.TOKEN_EXPIRATION) 
+        s = Serializer(
+            current_app.config['SECRET_KEY'],
+            expires_in=Config.TOKEN_EXPIRATION)
         return s.dumps({'id': self.id})
 
     @staticmethod
     def verify_auth_token(token):
-        s = Serializer(current_app.config['SECRET_KEY']) 
+        s = Serializer(current_app.config['SECRET_KEY'])
         try:
-            data = s.loads(token) 
+            data = s.loads(token)
         except:
             return None
         return User.query.get(data['id'])
 
     def __repr__(self):
-        return '<User {}><email {}><password_hash {}>'.format(self.username,self.email,self.password_hash)
+        return '<User {}><email {}><password_hash {}>'.format(
+            self.username, self.email, self.password_hash)
+
 
 #class Document
 #document in database, models the metadata for a captured document
 #also includes the document itself
 class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index = True)
-    type = db.Column(db.String(64), index = True)
-    extension = db.Column(db.String(64), index = True)
+    name = db.Column(db.String(64), index=True)
+    type = db.Column(db.String(64), index=True)
+    extension = db.Column(db.String(64), index=True)
     size = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    location = db.Column(db.String(512), index = True)
+    location = db.Column(db.String(512), index=True)
     body = db.Column(db.LargeBinary, nullable=True)
 
     def __repr__(self):
-        return '<Name {}><Type {}><Size {}>'.format(self.name, self.type, self.size)
+        return '<Name {}><Type {}><Size {}>'.format(self.name, self.type,
+                                                    self.size)
 
-    def to_json(self): 
+    def to_json(self):
         json_document = {
-            'name': self.name,
-            'type': self.type,
-            'extension': self.extension,
-            'size': self.size,
-            'user_id': self.user_id,
-            'location': self.location,
-            'body': url_for(self.name,            #offer the body through the internal path
-                                _external=True)
+            'name':
+            self.name,
+            'type':
+            self.type,
+            'extension':
+            self.extension,
+            'size':
+            self.size,
+            'user_id':
+            self.user_id,
+            'location':
+            self.location,
+            'body':
+            url_for(
+                self.name,  #offer the body through the internal path
+                _external=True)
         }
         return json_post
+
 
 @login.user_loader
 def load_user(id):

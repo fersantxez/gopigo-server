@@ -1,5 +1,4 @@
 #!venv/bin/python
-
 '''
 Class to control the interface with the GoPiGo I2C.
 I2C is a shared bus with multiple devices, which could be accessed from multiple processes as well as threads. 
@@ -15,11 +14,12 @@ logger = logging.getLogger(Config.APP_NAME)
 import fcntl
 import time
 
+
 class Mutex(object):
 
     DexterLockI2C_handle = None
 
-    def __init__(self, debug = False):
+    def __init__(self, debug=False):
         self.mutex_debug = debug
 
     def acquire(self):
@@ -29,11 +29,13 @@ class Mutex(object):
         acquired = False
         while not acquired:
             try:
-                self.DexterLockI2C_handle = open('/run/lock/DexterLockI2C', 'w')
+                self.DexterLockI2C_handle = open('/run/lock/DexterLockI2C',
+                                                 'w')
                 # lock
-                fcntl.lockf(self.DexterLockI2C_handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                fcntl.lockf(self.DexterLockI2C_handle,
+                            fcntl.LOCK_EX | fcntl.LOCK_NB)
                 acquired = True
-            except IOError: # already locked by a different process
+            except IOError:  # already locked by a different process
                 time.sleep(0.001)
             except Exception as e:
                 print(e)

@@ -1,5 +1,4 @@
 #!venv/bin/python
-
 '''
 Oauth helper module to handle Oauth/oauth2 with main providers
 '''
@@ -31,10 +30,12 @@ class OAuthSignIn(object):
         pass
 
     def get_callback_url(self):
-        logger.debug('**DEBUG: Oauth: get-Callback-URL: {}'.format(url_for('oauth_callback', provider=self.provider_name,
-                       _external=True)))
-        return url_for('oauth_callback', provider=self.provider_name,
-                       _external=True)
+        logger.debug('**DEBUG: Oauth: get-Callback-URL: {}'.format(
+            url_for(
+                'oauth_callback', provider=self.provider_name,
+                _external=True)))
+        return url_for(
+            'oauth_callback', provider=self.provider_name, _external=True)
 
     @classmethod
     def get_provider(self, provider_name):
@@ -53,17 +54,16 @@ class FacebookSignIn(OAuthSignIn):
             name='facebook',
             client_id=self.consumer_id,
             client_secret=self.consumer_secret,
-            authorize_url='https://graph.facebook.com/oauth/authorize',           
+            authorize_url='https://graph.facebook.com/oauth/authorize',
             access_token_url='https://graph.facebook.com/oauth/access_token',
-            base_url='https://graph.facebook.com/'
-        )
+            base_url='https://graph.facebook.com/')
 
     def authorize(self):
-        return redirect(self.service.get_authorize_url(
-            scope='email',
-            response_type='code',
-            redirect_uri=self.get_callback_url())
-        )
+        return redirect(
+            self.service.get_authorize_url(
+                scope='email',
+                response_type='code',
+                redirect_uri=self.get_callback_url()))
 
     def callback(self):
         def decode_json(payload):
@@ -72,22 +72,23 @@ class FacebookSignIn(OAuthSignIn):
         if 'code' not in request.args:
             return None, None, None
         oauth_session = self.service.get_auth_session(
-            data={'code': request.args['code'],
-                  'grant_type': 'authorization_code',
-                  'redirect_uri': self.get_callback_url()},
-            decoder=decode_json
-        )
+            data={
+                'code': request.args['code'],
+                'grant_type': 'authorization_code',
+                'redirect_uri': self.get_callback_url()
+            },
+            decoder=decode_json)
         me = oauth_session.get('me').json()
-        username = me.get('name').replace(' ','') #name without spaces
+        username = me.get('name').replace(' ', '')  #name without spaces
         #in case facebook does not provide email
         if not me.get('email'):
             #make it up putting together the name
-            me['email'] = username +'@facebook'
+            me['email'] = username + '@facebook'
         return (
-            'facebook$' + me['id'], #callback returns social_id, username, email
-            username,         #use "name" as "username"
-            me.get('email')
-            )
+            'facebook$' +
+            me['id'],  #callback returns social_id, username, email
+            username,  #use "name" as "username"
+            me.get('email'))
 
 
 class TwitterSignIn(OAuthSignIn):
@@ -100,13 +101,11 @@ class TwitterSignIn(OAuthSignIn):
             request_token_url='https://api.twitter.com/oauth/request_token',
             authorize_url='https://api.twitter.com/oauth/authorize',
             access_token_url='https://api.twitter.com/oauth/access_token',
-            base_url='https://api.twitter.com/1.1/'
-        )
+            base_url='https://api.twitter.com/1.1/')
 
     def authorize(self):
         request_token = self.service.get_request_token(
-            params={'oauth_callback': self.get_callback_url()}
-        )
+            params={'oauth_callback': self.get_callback_url()})
         session['request_token'] = request_token
         return redirect(self.service.get_authorize_url(request_token[0]))
 
@@ -117,55 +116,55 @@ class TwitterSignIn(OAuthSignIn):
         oauth_session = self.service.get_auth_session(
             request_token[0],
             request_token[1],
-            data={'oauth_verifier': request.args['oauth_verifier']}
-        )
+            data={'oauth_verifier': request.args['oauth_verifier']})
         me = oauth_session.get('account/verify_credentials.json').json()
         social_id = 'twitter$' + str(me.get('id'))
         #make-up a username - nickname, will be used for profile URLs etc
-        username = me.get('screen_name').replace(' ','') #without spaces
+        username = me.get('screen_name').replace(' ', '')  #without spaces
         #in case Twitter does not provide email
         if not me.get('email'):
             #make it up putting together the name
-            me['email'] = username +'@twitter'
-        return (social_id,
-                username, 
-                me.get('email')   # Twitter does not provide email
-                )
+            me['email'] = username + '@twitter'
+        return (
+            social_id,
+            username,
+            me.get('email')  # Twitter does not provide email
+        )
 
 
 class GoogleSignIn(OAuthSignIn):
     '''
     Shamelessly copied from https://github.com/heroku/heroku-airflow/blob/master/airflow_login/airflow_auth.py
     '''
+
     def __init__(self):
         super(GoogleSignIn, self).__init__('google')
         self.service = OAuth2Service(
-                name='google',
-                client_id=self.consumer_id,
-                client_secret=self.consumer_secret,
-                authorize_url="https://accounts.google.com/o/oauth2/v2/auth",
-                base_url="https://www.googleapis.com/oauth2/v3/userinfo",
-                access_token_url="https://www.googleapis.com/oauth2/v4/token"
-        )
+            name='google',
+            client_id=self.consumer_id,
+            client_secret=self.consumer_secret,
+            authorize_url="https://accounts.google.com/o/oauth2/v2/auth",
+            base_url="https://www.googleapis.com/oauth2/v3/userinfo",
+            access_token_url="https://www.googleapis.com/oauth2/v4/token")
 
-    def authorize(self):   #removed "scheme" as a parameter
-        return redirect(self.service.get_authorize_url(
-            scope='email profile',
-            response_type='code',
-            redirect_uri=self.get_callback_url())   #was get_callback_url(scheme)
-            )
+    def authorize(self):  #removed "scheme" as a parameter
+        return redirect(
+            self.service.get_authorize_url(
+                scope='email profile',
+                response_type='code',
+                redirect_uri=self.get_callback_url()
+            )  #was get_callback_url(scheme)
+        )
 
     def callback(self):
         if 'code' not in request.args:
             return None, None, None
         oauth_session = self.service.get_auth_session(
-                data={'code': request.args['code'],
-                      'grant_type': 'authorization_code',
-                      'redirect_uri': self.get_callback_url()
-                     },
-                decoder = json.loads
-        )
+            data={
+                'code': request.args['code'],
+                'grant_type': 'authorization_code',
+                'redirect_uri': self.get_callback_url()
+            },
+            decoder=json.loads)
         me = oauth_session.get('').json()
-        return (me['name'],
-                me['sub'],
-                me['email'])
+        return (me['name'], me['sub'], me['email'])

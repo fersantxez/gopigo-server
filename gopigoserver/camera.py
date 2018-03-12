@@ -1,5 +1,4 @@
 #!venv/bin/python
-
 '''
 Class to expose the camera to the app.
 Shamelessly copied from:
@@ -28,8 +27,8 @@ class Camera(BaseCamera):
             camera.resolution = Config.CAMERA_RES
             camera.sharpness = Config.CAMERA_SHARPNESS
             stream = io.BytesIO()
-            for _ in camera.capture_continuous(stream, 'jpeg',
-                                                 use_video_port=True):
+            for _ in camera.capture_continuous(
+                    stream, 'jpeg', use_video_port=True):
                 # return current frame
                 stream.seek(0)
                 yield stream.read()

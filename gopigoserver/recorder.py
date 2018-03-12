@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 '''
 A recorder driver capable of recording voice samples from the VoiceHat microphones.
 Shamelessly copied from:
@@ -47,8 +46,11 @@ class Recorder(threading.Thread):
 
     CHUNK_S = 0.1
 
-    def __init__(self, input_device=Config.RECORDING_DEVICE,
-                 channels=1, bytes_per_sample=Config.AUDIO_SAMPLE_SIZE, sample_rate_hz=Config.AUDIO_SAMPLE_RATE_HZ):
+    def __init__(self,
+                 input_device=Config.RECORDING_DEVICE,
+                 channels=1,
+                 bytes_per_sample=Config.AUDIO_SAMPLE_SIZE,
+                 sample_rate_hz=Config.AUDIO_SAMPLE_RATE_HZ):
         """Create a Recorder with the given audio format.
 
         The Recorder will not start until start() is called. start() is called
@@ -64,21 +66,27 @@ class Recorder(threading.Thread):
         #super(Recorder, self).__init__()   #python2 OK
         #self.setDaemon(True)               #python2
         #super(Recorder).init()             #python2 NOK
-        super().__init__(daemon=True)       #python3
+        super().__init__(daemon=True)  #python3
 
         self._processors = []
 
-        self._chunk_bytes = int(self.CHUNK_S * sample_rate_hz) * channels * bytes_per_sample
+        self._chunk_bytes = int(
+            self.CHUNK_S * sample_rate_hz) * channels * bytes_per_sample
 
         self._cmd = [
             'arecord',
             '-q',
-            '-t', 'raw',
-            '-D', input_device,
-            '-c', str(channels),
+            '-t',
+            'raw',
+            '-D',
+            input_device,
+            '-c',
+            str(channels),
             # pylint: disable=W0212
-            '-f', sample_width_to_string(bytes_per_sample),
-            '-r', str(sample_rate_hz),
+            '-f',
+            sample_width_to_string(bytes_per_sample),
+            '-r',
+            str(sample_rate_hz),
         ]
         self._arecord = None
         self._closed = False
@@ -109,7 +117,9 @@ class Recorder(threading.Thread):
 
     def run(self):
         """Reads data from arecord and passes to processors."""
-        logger.debug('About to create and pipe a process to read from stdout on device {}'.format(Config.RECORDING_DEVICE))
+        logger.debug(
+            'About to create and pipe a process to read from stdout on device {}'.
+            format(Config.RECORDING_DEVICE))
         self._arecord = subprocess.Popen(self._cmd, stdout=subprocess.PIPE)
         logger.info("started recording")
 
@@ -122,9 +132,11 @@ class Recorder(threading.Thread):
         this_chunk = b''
 
         while True:
-            logger.debug('About to read from stdout on device {}'.format(Config.RECORDING_DEVICE))
-            input_data = self._arecord.stdout.read(self._chunk_bytes) #FIXME: change to better pipe management
-                                        #http://kendriu.com/how-to-use-pipes-in-python-subprocesspopen-objects
+            logger.debug('About to read from stdout on device {}'.format(
+                Config.RECORDING_DEVICE))
+            input_data = self._arecord.stdout.read(
+                self._chunk_bytes)  #FIXME: change to better pipe management
+            #http://kendriu.com/how-to-use-pipes-in-python-subprocesspopen-objects
             if not input_data:  #FIXME: apparently this works until the mic doesnt detect signal
                 break
 
@@ -158,7 +170,7 @@ class Recorder(threading.Thread):
         #if not self.is_alive():
         print('WHATS UP!!!!')
         logger.debug('OH FUCK IM NOT ALIVE. WHATS UP WITH THAT?')
-        self.start()        #FIXME: start only if not existing
+        self.start()  #FIXME: start only if not existing
         return self
 
     def __exit__(self, *args):

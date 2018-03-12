@@ -3,55 +3,52 @@ import logging
 
 import os
 
-class Config (object):
+
+class Config(object):
     WTF_CSRF_ENABLED = True
     SECRET_KEY = 'you-will-never-guess'
     #Working directories
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-    MEDIA_DIR = os.path.join(BASE_DIR, 'app', 'static', 'media')    #for static content
+    MEDIA_DIR = os.path.join(BASE_DIR, 'app', 'static',
+                             'media')  #for static content
     #dB configuration
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(BASE_DIR, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
-    EMPTY_PICTURE='dex-advanced.png'
+
+    EMPTY_PICTURE = 'dex-advanced.png'
     DATABASE_FILE_NAME = "app.db"
     PORT = 5000
-    
+
     DEBUG_MODE = True
-    
+
     #APP RUN OPTIONS
     APP_RUN_OPTS = {
-        'host':     '0.0.0.0',
+        'host': '0.0.0.0',
         'threaded': 'True',
-        'port':     PORT,
-        'debug':    DEBUG_MODE
+        'port': PORT,
+        'debug': DEBUG_MODE
     }
 
     #logging options
     APP_NAME = 'gopigo-server'
     logger = logging.getLogger(APP_NAME)
-    LOGGING_FORMAT = '%(asctime)-15s %(message)s' #'%(asctime)-15s %(clientip)s %(user)-8s %(message)s'
+    LOGGING_FORMAT = '%(asctime)-15s %(message)s'  #'%(asctime)-15s %(clientip)s %(user)-8s %(message)s'
     if DEBUG_MODE:
-        LOGGING_LEVEL = logging.DEBUG 
+        LOGGING_LEVEL = logging.DEBUG
     else:
         LOGGING_LEVEL = logging.INFO
 
     #storage configuration
-    STORAGE_TYPE = "local" #local , gcs , s3
+    STORAGE_TYPE = "local"  #local , gcs , s3
 
     #video configuration
     CAMERA_RES = "640x480"
     CAMERA_SHARPNESS = 100
-    
+
     #camera resolutions
-    CAMERA_RES_LIST=[
-        ("1", "VGA"),
-        ("2", "640x480"),
-        ("3", "1024x768"),
-        ("4", "1280x720"),
-        ("5", "HD")
-    ]
+    CAMERA_RES_LIST = [("1", "VGA"), ("2", "640x480"), ("3", "1024x768"),
+                       ("4", "1280x720"), ("5", "HD")]
 
     #TODO: read these from an environment variable
     OAUTH_CREDENTIALS = {
@@ -64,39 +61,39 @@ class Config (object):
             'secret': 'nBniFqPRIHz1xUpkjcwgc1WvTqncOWPk6gh3U5HpgLp2g9WjaA'
         },
         'google': {
-            'id': '742545609133-3tg386j5flmqbvub28oshb417f6vblui.apps.googleusercontent.com',
-            'secret': 'qaotl6xMdBLTcSAIm5iiYCar'
+            'id':
+            '742545609133-3tg386j5flmqbvub28oshb417f6vblui.apps.googleusercontent.com',
+            'secret':
+            'qaotl6xMdBLTcSAIm5iiYCar'
         },
     }
 
-    PIN_NUMBER_SERVO = 15 #this is port A1 according to https://github.com/DexterInd/GoPiGo/blob/master/Software/Python/Examples/Ultrasonic_Servo/us_servo_scan.py
+    PIN_NUMBER_SERVO = 15  #this is port A1 according to https://github.com/DexterInd/GoPiGo/blob/master/Software/Python/Examples/Ultrasonic_Servo/us_servo_scan.py
 
     #audio configuration
 
     #HTTP Authentication configuration
-    TOKEN_EXPIRATION = 3600 #seconds
+    TOKEN_EXPIRATION = 3600  #seconds
 
     #GCP app dafault credentials location - Read from environment variable or hardcode by default
-    GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION=os.environ.get(
+    GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION = os.environ.get(
         'GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION',
-        "/home/pi/.ssh/gcp-application-default-credentials.json" )      #default value if var not defined
-    logger.debug('GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION: {}'.format(GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION))
+        "/home/pi/.ssh/gcp-application-default-credentials.json"
+    )  #default value if var not defined
+    logger.debug('GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION: {}'.format(
+        GCP_APPLICATION_DEFAULT_CREDENTIALS_LOCATION))
 
-    bucket_name = "" #to be set on app init
+    bucket_name = ""  #to be set on app init
 
     #Vision API parameters and function associated with each that processes the API response
-    VISION_API_FEATURES_LIST=[
-        ("1", "LABEL_DETECTION"),
-        ("2", "TEXT_DETECTION"),
-        ("3", "DOCUMENT_TEXT_DETECTION"),
-        ("4", "FACE_DETECTION"),
-        ("5", "LANDMARK_DETECTION"),
-        ("6", "LOGO_DETECTION"),
-        ("7", "SAFE_SEARCH_DETECTION"),
-        ("8", "IMAGE_PROPERTIES")
+    VISION_API_FEATURES_LIST = [
+        ("1", "LABEL_DETECTION"), ("2", "TEXT_DETECTION"),
+        ("3", "DOCUMENT_TEXT_DETECTION"), ("4", "FACE_DETECTION"),
+        ("5", "LANDMARK_DETECTION"), ("6", "LOGO_DETECTION"),
+        ("7", "SAFE_SEARCH_DETECTION"), ("8", "IMAGE_PROPERTIES")
     ]
 
-    VISION_API_UNPACK_FUNCTIONS={
+    VISION_API_UNPACK_FUNCTIONS = {
         "LABEL_DETECTION": "unpack_label_detection",
         "TEXT_DETECTION": "unpack_text_detection",
         "DOCUMENT_TEXT_DETECTION": "unpack_document_text_detection",
@@ -108,29 +105,26 @@ class Config (object):
     }
 
     #how to describe each feature from the face detection api
-    FACE_DETECTION_FEATURES={
-        "joy_likelihood":   "joy",
-        "sorrow_likelihood":    "sorrow",
+    FACE_DETECTION_FEATURES = {
+        "joy_likelihood": "joy",
+        "sorrow_likelihood": "sorrow",
         "anger_likelihood": "anger",
-        "surprise_likelihood":  "surprise",
-        "headwear_likelihood":  "headwear"
+        "surprise_likelihood": "surprise",
+        "headwear_likelihood": "headwear"
     }
 
     #when to consider a value as detected
-    LIKELIHOOD_NAME = ('UNKNOWN', 'VERY_UNLIKELY', 'UNLIKELY', 'POSSIBLE', 'LIKELY', 'VERY_LIKELY')
-    ACCEPTED_LIKELIHOOD = ("VERY_LIKELY", "LIKELY")   #"POSSIBLE"
-    
+    LIKELIHOOD_NAME = ('UNKNOWN', 'VERY_UNLIKELY', 'UNLIKELY', 'POSSIBLE',
+                       'LIKELY', 'VERY_LIKELY')
+    ACCEPTED_LIKELIHOOD = ("VERY_LIKELY", "LIKELY")  #"POSSIBLE"
+
     #Audio config
-    PLAYBACK_DEVICE=""
-    RECORDING_DEVICE="sysdefault:CARD=Device"
+    PLAYBACK_DEVICE = ""
+    RECORDING_DEVICE = "sysdefault:CARD=Device"
     AUDIO_SAMPLE_SIZE = 2  # bytes per sample
     AUDIO_SAMPLE_RATE_HZ = 16000
     TTS_VOLUME = 60
     TTS_PITCH = 130
-    TTS_VOICE = 'm2' #The variants are +m1 +m2 +m3 +m4 +m5 +m6 +m7 for male voices and +f1 +f2 +f3 +f4 which
-                     # simulate female voices by using higher pitches. Other variants include +croak and +whisper.
+    TTS_VOICE = 'm2'  #The variants are +m1 +m2 +m3 +m4 +m5 +m6 +m7 for male voices and +f1 +f2 +f3 +f4 which
+    # simulate female voices by using higher pitches. Other variants include +croak and +whisper.
     TTS_LANGUAGE = 'en-US'
-
-
-    
-    

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 '''
 A driver for audio playback.
 Shamelessly copied from:
@@ -49,12 +48,17 @@ class Player(object):
         cmd = [
             'aplay',
             '-q',
-            '-t', 'raw',
-            '-D', self._output_device,
-            '-c', '1',
+            '-t',
+            'raw',
+            '-D',
+            self._output_device,
+            '-c',
+            '1',
             # pylint: disable=W0212
-            '-f', sample_width_to_string(sample_width),
-            '-r', str(sample_rate),
+            '-f',
+            sample_width_to_string(sample_width),
+            '-r',
+            str(sample_rate),
         ]
 
         aplay = subprocess.Popen(cmd, stdin=subprocess.PIPE)

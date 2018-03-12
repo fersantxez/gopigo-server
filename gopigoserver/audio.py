@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 '''
 Drivers for audio functionality..
 Shamelessly copied from:
@@ -76,6 +75,7 @@ class _WaveDump(object):
     def exit(self, *args):
         self._wave.close()
 
+
 def get_player():
     """Returns a driver to control the gopigo speaker.
 
@@ -99,7 +99,7 @@ def get_recorder():
     use this.
     """
     global _gopigo_recorder
-    if not _gopigo_recorder:    #FIXME: this is not working to re-use same thread.
+    if not _gopigo_recorder:  #FIXME: this is not working to re-use same thread.
         _gopigo_recorder = gopigoserver.recorder.Recorder()
         logger.debug("created a new recorder: {}".format(_gopigo_recorder))
     return _gopigo_recorder
@@ -132,7 +132,11 @@ def play_wave(wave_file):
 def play_audio(audio_data):
     """Plays the given audio data."""
     player = get_player()
-    player.play_bytes(audio_data, sample_width=AUDIO_SAMPLE_SIZE, sample_rate=AUDIO_SAMPLE_RATE_HZ)
+    player.play_bytes(
+        audio_data,
+        sample_width=AUDIO_SAMPLE_SIZE,
+        sample_rate=AUDIO_SAMPLE_RATE_HZ)
+
 
 def set_tts_volume(volume):
     global _tts_volume
@@ -181,24 +185,34 @@ def say(words, lang=Config.TTS_LANGUAGE, volume=_tts_volume, pitch=_tts_pitch):
     logger.debug("I've got a Player that looks like: {}".format(player))
     #create buffer file and send to player
     try:
-        (fd, tts_wav) = tempfile.mkstemp(suffix='.wav', dir=Config.MEDIA_DIR) #FIXME: use media dir, then upload to Cloud?
+        (fd, tts_wav) = tempfile.mkstemp(
+            suffix='.wav',
+            dir=Config.MEDIA_DIR)  #FIXME: use media dir, then upload to Cloud?
     except IOError:
         logger.exception('Using fallback directory for TTS output')
         (fd, tts_wav) = tempfile.mkstemp(suffix='.wav')
     os.close(fd)
     logger.debug('have a file {} to use as buffer in {}'.format(fd, tts_wav))
     #configure the voice and say something through espeak
-    voice=Config.TTS_VOICE
-    langvoice=str(lang)+"+"+voice       #espeak format "-ven-us+m2"
-    emphasis='-k'+'20'                  #emphasis on capital letters
+    voice = Config.TTS_VOICE
+    langvoice = str(lang) + "+" + voice  #espeak format "-ven-us+m2"
+    emphasis = '-k' + '20'  #emphasis on capital letters
     try:
         #subprocess.call(['pico2wave', '--lang', lang, '-w', tts_wav, words])
-        logger.debug('Calling espeak to say the words: {} to file {}'.format(words, tts_wav))
-        subprocess.call(['espeak', '-v', langvoice, '-a', str(volume), '-s', str(pitch), '-k', emphasis, '-w', tts_wav, words])
-        logger.debug('about to call the Player to "read" from the file {} the words: {}'.format(tts_wav, words))
-        player.play_wav(tts_wav) #not fd which is the descriptor
+        logger.debug('Calling espeak to say the words: {} to file {}'.format(
+            words, tts_wav))
+        subprocess.call([
+            'espeak', '-v', langvoice, '-a',
+            str(volume), '-s',
+            str(pitch), '-k', emphasis, '-w', tts_wav, words
+        ])
+        logger.debug(
+            'about to call the Player to "read" from the file {} the words: {}'.
+            format(tts_wav, words))
+        player.play_wav(tts_wav)  #not fd which is the descriptor
     finally:
         os.unlink(tts_wav)
+
 
 def listen(filepath, duration):
     """record for a given number of seconds. Simplistic to test recording and threading"""

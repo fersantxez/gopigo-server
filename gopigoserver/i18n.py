@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 '''
 Internationalization helpers.
 Shamelessly copied from:
@@ -55,9 +54,11 @@ def set_language_code(code, gettext_install=False):
 
     if gettext_install:
         if not _locale_dir:
-            raise ValueError('locale_dir is not set. Please call set_locale_dir().')
+            raise ValueError(
+                'locale_dir is not set. Please call set_locale_dir().')
         language_id = code.replace('-', '_')
-        t = gettext.translation(_LOCALE_DOMAIN, _locale_dir, [language_id], fallback=True)
+        t = gettext.translation(
+            _LOCALE_DOMAIN, _locale_dir, [language_id], fallback=True)
         t.install()
 
 
